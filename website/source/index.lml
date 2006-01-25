@@ -34,7 +34,7 @@ other than announcements."))
         (:H3 "Where is it")
         (:P "A " (rw:link :darcs) " repository is available (note that you'll also need " (rw:link :metatilities) " and " (rw:link :moptilities) " to get CL-MathStats to work). The commands are listed below:")
         (:PRE 
-         "darcs get http://common-lisp.net/project/cl-mathstat/darcs/cl-mathstat
+         "darcs get http://common-lisp.net/project/cl-mathstats/darcs/cl-mathstats
 darcs get http://common-lisp.net/project/cl-containers/metatilities/darcs/metatilities
 darcs get http://common-lisp.net/project/cl-containers/moptilities/darcs/moptilities")
         (:P "CL-MathStats (and friends) should also be " (rw:link :asdf-install :title "ASDF installable") ". Its CLiki home is right " (rw:link :cl-mathstats-cliki :title "where") " you'd expect.")
