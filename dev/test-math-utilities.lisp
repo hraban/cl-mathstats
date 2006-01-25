@@ -1,0 +1,16 @@
+(in-package metabang.math)
+
+(deftestsuite on-interval () ()
+  (:tests 
+   ((ensure (on-interval 1.0 0 1)))
+   ((ensure (not (on-interval 1.0 0 1 :upper-inclusive? nil))))
+   ((ensure (on-interval 0 0 1)))
+   ((ensure (not (on-interval 0 0 1 :lower-inclusive? nil))))
+   ((ensure (not (on-interval 2 0 1))))
+   ((ensure (not (on-interval 2 0 1 :lower-inclusive? nil))))
+   ((ensure (not (on-interval 2 0 1 :upper-inclusive? nil))))
+   ((ensure (not (on-interval 2 0 1 :lower-inclusive? nil :upper-inclusive? nil))))
+   ((ensure (on-interval single-float-epsilon 0 1)))
+   ((ensure (on-interval single-float-epsilon 0 1 :lower-inclusive? nil)))
+   ((ensure (not (on-interval 0 single-float-epsilon 1))))
+   ((ensure (not (on-interval 0 single-float-epsilon 1 :lower-inclusive? nil))))))
