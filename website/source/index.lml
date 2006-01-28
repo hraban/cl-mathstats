@@ -10,11 +10,10 @@
     (generate-two-line-header
      "CL-MathStats" "Words cannot express")
     
-    ((:TABLE :CLASS "system-overview")
-     (:tr
-      (generate-system-sidebar)
-      
-      ((:TD :CLASS "system-description")
+    ((:DIV :CLASS "contents")
+     (generate-system-sidebar)
+     
+     ((:DIV :CLASS "system-description")
        (:H3 "What it is")
        (:P "CL-MathStats is an unordered collection of mathematical routines. ")
        (:P (rw:link :tinaa) " documentation for CL-MathStats is "
@@ -45,7 +44,7 @@ darcs get http://common-lisp.net/project/cl-containers/moptilities/darcs/moptili
         ((:TABLE :BORDER "0") 
          ((:TR :ALIGN "left" :VALIGN "top")
           ((:TD) "11 Nov 2005")
-          (:TD "Just getting things set up here.")))))))
+          (:TD "Just getting things set up here."))))))
     
     ((:DIV :CLASS "footer")
      (generate-button-row 
