@@ -23,4 +23,28 @@ DISCUSSION
    #:matrix-multiply
    #:matrix-trace
    #:normalize-matrix
-   #:sum-of-array-elements))
+   #:sum-of-array-elements)
+  
+  (:export
+   #:truncate-to-factor
+   #:round-to-factor
+   #:ensure-float
+   #:linear-scale
+   #:2fpi
+   #:fpi
+   #:degrees->radians
+   #:radians->degrees
+   #:on-interval
+   #:combination-count
+   #:permutation-count
+   #:square
+   #:f-measure
+   #:+e+)
+  
+  (:export
+   #:times2
+   #:div2 
+   #:exp2 
+   #:log2 
+   #:trunc2 
+   #:mod2))

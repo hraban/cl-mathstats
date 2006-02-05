@@ -1,22 +1,5 @@
 (in-package metabang.math)
 
-(export '(truncate-to-factor
-          round-to-factor
-          ensure-float
-          linear-scale
-          2fpi
-          fpi
-          degrees->radians
-          radians->degrees
-          on-interval
-          combination-count
-          permutation-count
-          square
-          f-measure
-          +e+))
-          
-;;; ---------------------------------------------------------------------------
-
 (declaim (inline ensure-float)) 
 (defun ensure-float (number)
   (float number 1.0d0))
@@ -42,7 +25,6 @@
 ;;;----------------------------------------------------------------------------
 ;;; Non-binary math.
 
-(proclaim '(inline truncate-to-factor))
 (defun truncate-to-factor (n factor)
   "Equivalent to (* factor (truncate n factor)).  For example,
 `truncate-to-factor' of 65 and 60 is 60.  Useful for converting to certain
@@ -54,12 +36,16 @@ units, say when converting minutes to hours and minutes.  See also
 (defun test-truncate-to-factor ()
   (spy (truncate-to-factor 65 60)))
 
-(proclaim '(inline round-to-factor))
 (defun round-to-factor (n factor)
   "Equivalent to (* factor (round n factor)).  For example, `round-to-factor' of
 65 and 60 is 60.  Useful for converting to certain units, say when converting
 minutes to the nearest hours.  See also `truncate-to-factor.'"
   (* factor (round n factor)))
+
+(eval-when (:compile-toplevel)
+  (proclaim '(inline truncate-to-factor))
+  (proclaim '(inline round-to-factor)))
+
 
 ;;; ---------------------------------------------------------------------------
 
