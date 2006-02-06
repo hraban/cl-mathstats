@@ -15,12 +15,6 @@ DISCUSSION
 |#
 (in-package metabang.math)
 
-(export '(+0degrees+ +5degrees+ +10degrees+ +15degrees+
-          +30degrees+ +45degrees+ +60degrees+ +90degrees+
-          +120degrees+ +135degrees+ +150degrees+ +180degrees+ +210degrees+ 
-          +225degrees+ +240degrees+ +270degrees+ +300degrees+ +315degrees+
-          +330degrees+ +360degrees+))
-
 (defconstant +0degrees+   (degrees->radians 0))
 (defconstant +5degrees+   (degrees->radians 5))
 (defconstant +10degrees+  (degrees->radians 10))

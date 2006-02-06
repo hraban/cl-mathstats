@@ -86,7 +86,8 @@ slots in order of specification in the superclasses which are also statistics."
     (setf documentation (format nil "~a ~a~%~a" name (remove-&rest lambda-list) documentation))
     (setf superclasses (append superclasses (list root-statistical-superclass)))
     `(progn
-       (export ',name)
+       (eval-when (:compile-toplevel)
+         (export ',name))
        (defclass ,name ,superclasses
          ,slots)
        (setf (get ',name :values) ',values)
@@ -153,7 +154,6 @@ slots in order of specification in the superclasses which are also statistics."
   nil)
 
 (defmethod statisticp ((it statistic))
-  (declare (ignore it))
   t)
 
 (defmethod composite-statistic-p (it)
@@ -161,7 +161,6 @@ slots in order of specification in the superclasses which are also statistics."
   nil)
 
 (defmethod composite-statistic-p ((it composite-statistic))
-  (declare (ignore it))
   t)
 
 (defmethod simple-statistic-p (it)

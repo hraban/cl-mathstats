@@ -15,25 +15,6 @@ DISCUSSION
 |#
 (in-package metabang.math)
 
-(export '(correlation
-          correlation-from-summaries
-          partials-from-parents
-          lagged-correlation
-          cross-correlation
-          autocorrelation
-          linear-regression-minimal-summaries
-          linear-regression-minimal
-          linear-regression-brief-summaries
-          linear-regression-brief
-          linear-regression-verbose-summaries
-          linear-regression-verbose
-          multiple-linear-regression-normal
-          multiple-linear-regression-arrays
-          multiple-linear-regression-minimal
-          multiple-linear-regression-brief
-          multiple-linear-regression-verbose
-          correlation-matrix))
-
 ;;; ---------------------------------------------------------------------------
 ;;; correlation, various types
 ;;; ---------------------------------------------------------------------------

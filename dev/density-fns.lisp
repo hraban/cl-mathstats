@@ -34,47 +34,7 @@
 ;;; performance of this software, even if EKSL is advised of the possiblity of
 ;;; such damages.
 
-;;; For more information write to clasp-support@cs.umass.edu
-
-;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-;;;
-;;; 02-13-93 Changed uses of return-from' to use `values' to return multiple 
-;;;          values - removed Explorerism. Removed optimize declaration at
-;;;          head of file.  (Westy)
-;;; 02-13-93 **** error-function-complement-helper **** will not compile in
-;;;          MCL.  (Westy)
-;;; 07-12-94 Changed `underflow-goes-to-zero' to use
-;;;          `lcl::floating-point-underflow' in Lucid.  (Westy)
-;;;
-;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-;;; --*--
-
 (in-package metabang.math)
-
-(export '(gamma-ln
-          factorial-exact
-          factorial
-          factorial-ln
-          binomial-coefficient
-          binomial-coefficient-exact
-          binomial-probability
-          binomial-probability-exact
-          beta
-          safe-exp
-          underflow-goes-to-zero
-          without-floating-underflow-traps
-          gamma-incomplete
-          error-function
-          gaussian-cdf
-          error-function-complement
-          gaussian-significance
-          poisson-cdf
-          chi-square-significance
-          beta-incomplete
-          students-t-significance
-          f-significance
-          binomial-cdf
-          binomial-cdf-exact))
 
 ;;; --*--
 ;;; ***************************************************************************

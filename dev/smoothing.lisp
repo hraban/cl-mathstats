@@ -15,11 +15,6 @@ DISCUSSION
 |#
 (in-package metabang.math)
 
-(export '(smooth-median-2 smooth-median-3 smooth-median-4
-          smooth-median-5 smooth-hanning smooth-4253h
-          smooth-mean-2 smooth-mean-3 smooth-mean-4
-          smooth-mean-5))
-
 #+Test
 (defun compare-smoothers (data)
   (mapc (lambda (f)
