@@ -88,7 +88,7 @@ DISCUSSION
    #:smooth-mean-2 #:smooth-mean-3 #:smooth-mean-4
    #:smooth-mean-5)
   
-  (export 
+  (:export 
    #:correlation
    #:correlation-from-summaries
    #:partials-from-parents
