@@ -13,6 +13,8 @@
   
   :components ((:module "dev"
                         :components ((:file "package")
+                                     (:file "api"
+                                            :depends-on ("package"))
                                      (:file "parameters"
                                             :depends-on ("package"))
                                      (:file "math-utilities"

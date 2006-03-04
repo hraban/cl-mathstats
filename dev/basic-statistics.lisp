@@ -6,12 +6,6 @@
 
 (in-package metabang.math)
 
-(export '(confidence-interval-t-summaries
-          scheffe-tests
-          r-score
-          smooth-4253H
-          convert))
-
 ;;; ---------------------------------------------------------------------------
 ;;; SIMPLE STATISTICS
 
@@ -1109,6 +1103,19 @@ Formula XYi = Xi * Yi."
 	      (not (equal (length  number-list-1) 
 			  (length  number-list-2))))
     (mapcar #'* number-list-1 number-list-2)))
+
+;;; ---------------------------------------------------------------------------
+
+(defgeneric dot-product (sequence-1 sequence-2)
+  (:documentation "http://en.wikipedia.org/wiki/Dot_product"))
+
+(defmethod dot-product ((number-list-1 sequence) (number-list-2 sequence))
+  "Takes two sequences of numbers and returns the dot product."
+  (unless (or (member 'nil number-list-1) 
+       (member 'nil number-list-2)
+       (not (equal (length  number-list-1) 
+     (length  number-list-2))))
+    (reduce #'+ (mapcar #'* number-list-1 number-list-2))))
 
 ;;; ---------------------------------------------------------------------------
 

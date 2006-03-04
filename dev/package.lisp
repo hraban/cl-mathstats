@@ -106,4 +106,13 @@ DISCUSSION
    #:multiple-linear-regression-minimal
    #:multiple-linear-regression-brief
    #:multiple-linear-regression-verbose
-   #:correlation-matrix))
+   #:correlation-matrix)
+  
+  (:export
+   #:confidence-interval-t-summaries
+   #:scheffe-tests
+   #:r-score
+   #:smooth-4253H
+   #:convert
+   #:cross-product
+   #:dot-product))
