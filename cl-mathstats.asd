@@ -9,7 +9,7 @@
   :author "Gary Warren King <gwking@metabang.com>"
   :maintainer "Gary Warren King <gwking@metabang.com>"
   :licence "MIT Style License"
-  :description "A generic container library for Common Lisp"
+  :description "Common Lisp math and statistics routines"
   
   :components ((:module "dev"
                         :components ((:file "package")
