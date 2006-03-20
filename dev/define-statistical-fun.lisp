@@ -60,7 +60,7 @@ values is assumed to be direct slots in order of specification, inherited
 slots in order of specification in the superclasses which are also statistics."
   (let* ((documentation (when (stringp (first body)) (pop body)))
          (wrapper-arglist (gensym "ARGS"))
-         (internal-name (intern (format nil "~a-INTERNAL" (string name)) :CL-MATHSTATS))
+         (internal-name (intern (format nil "~a-INTERNAL" (string name)) '#:cl-mathstats))
          (statistical-superclasses (loop for superclass in superclasses
                                        if (subtypep superclass 'statistic)
                                        collect superclass))

@@ -1,5 +1,5 @@
 (in-package common-lisp-user)
 
-(defpackage "METABANG.CL-MATHSTATS-TEST"
-  (:use "COMMON-LISP" "CL-MATHSTATS" "LIFT" "METATILITIES")
-  (:nicknames "CL-MATHSTATS-TEST"))
+(defpackage #:metabang.cl-mathstats-test
+  (:use #:common-lisp #:cl-mathstats #:lift #:metatilities)
+  (:nicknames #:cl-mathstats-test))

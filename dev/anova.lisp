@@ -2,17 +2,10 @@
 
 #| simple-header
 
-$Id: anova.lisp,v 1.1 2005/04/25 01:34:39 gwking Exp $
-
-Copyright 1992 - 2005 Experimental Knowledge Systems Lab, 
-University of Massachusetts Amherst MA, 01003-4610
-Professor Paul Cohen, Director
-
 Author: EKSL Utilities
 
-DISCUSSION
-
 |#
+
 (in-package metabang.math)
 
 (define-statistic anova-one-way-variables ()
@@ -60,77 +53,77 @@ representation.  See the manual for more information."
      (case n2
        (0 (error 'no-data))
        (1 (error 'insufficient-data)))
-     ;; These variable names aren't intuitive without reading the discussion in
+     ;; these variable names aren't intuitive without reading the discussion in
      ;; the manual.
-     (let* ((N   n2)
-	    (GT  (reduce #'+ dv))		; grand total
-	    (A   (reduce #'+ dv :key #'square))
-	    (B   (/ (square GT) N))
-	    (C   0)
-	    (NG  0)				; number of groups
+     (let* ((n   n2)
+	    (gt  (reduce #'+ dv))		; grand total
+	    (a   (reduce #'+ dv :key #'square))
+	    (b   (/ (square gt) n))
+	    (c   0)
+	    (ng  0)				; number of groups
 	    (group-means nil)
 	    (group-sizes nil))
-       ;; The following loop calculates C and the group means by going through
-       ;; the IV and DV looking for group boundaries.  Using '#:new as the
+       ;; the following loop calculates c and the group means by going through
+       ;; the iv and dv looking for group boundaries.  using '#:new as the
        ;; current group guarantees that the first element will start a new group,
        ;; because it can't be eql to anything.
        (let ((current-group '#:new) group-sum group-length)
 	 ;; use `map' `nil' because inputs are sequences, not even guaranteed to be
-	 ;; of the same type.  `Loop' would be more efficient, but would require a
-	 ;; four-leaf type tree.  Yuck!
+	 ;; of the same type.  `loop' would be more efficient, but would require a
+	 ;; four-leaf type tree.  yuck!
 	 (map nil #'(lambda (key value)
 		      (unless (eql key current-group)
 		        ;; process end of group and begin new group
 		        (unless (null group-sum)
 			  ;; a null group-sum means there is no previous group to end
-			  (incf NG)
+			  (incf ng)
 			  (when (< group-length 2) (error 'insufficient-data))
 			  (push (/ group-sum group-length) group-means)
 			  (push group-length group-sizes)
-			  (incf C (/ (square group-sum) group-length)))
+			  (incf c (/ (square group-sum) group-length)))
 		        (setf current-group key
 			      group-sum 0
 			      group-length 0))
 		      ;; normal group processing
 		      (incf group-sum value)
 		      (incf group-length))
-	      IV DV)
+	      iv dv)
 	 ;; process last group
-	 (incf NG)
+	 (incf ng)
 	 (when (< group-length 1) (error 'insufficient-data))
 	 (push (/ group-sum group-length) group-means)
 	 (push group-length group-sizes)
 	 (setf group-means (nreverse group-means))
 	 (setf group-sizes (nreverse group-sizes))
-	 (incf C (/ (square group-sum) group-length)))
-       (let ((SST (- A B))
-	     (SSG (- C B))
-	     (SSE (- A C)))
+	 (incf c (/ (square group-sum) group-length)))
+       (let ((sst (- a b))
+	     (ssg (- c b))
+	     (sse (- a c)))
 	 (when (zerop sse) (error 'zero-variance))
-	 ;; The following two computations are for error checking.  See discussion
-	 ;; in the manual.  SST-alt is returned as the second value.
-	 (let* ((grand-mean (/ GT N))
-	        (SST-alt    (reduce #'+ dv :key
+	 ;; the following two computations are for error checking.  see discussion
+	 ;; in the manual.  sst-alt is returned as the second value.
+	 (let* ((grand-mean (/ gt n))
+	        (sst-alt    (reduce #'+ dv :key
 				    #'(lambda (elt) (square (- elt grand-mean))))))
 	   ;; final calculations
-	   (let* ((DFG (1- NG))
-		  (DFE (- N NG))
-		  (DFT (+ DFG DFE))
-		  (MSG (/ SSG DFG))
-		  (MSE (/ SSE DFE)))
-	     ;; Yes, it's correct to compute the f-significance by a one-tailed
-	     ;; test, because if H0 is false, F is known to be biased on the
+	   (let* ((dfg (1- ng))
+		  (dfe (- n ng))
+		  (dft (+ dfg dfe))
+		  (msg (/ ssg dfg))
+		  (mse (/ sse dfe)))
+	     ;; yes, it's correct to compute the f-significance by a one-tailed
+	     ;; test, because if h0 is false, f is known to be biased on the
 	     ;; large side, and so we're only interested in the upper tail of the
-	     ;; F distribution.
+	     ;; f distribution.
 	     (let* ((f (/ msg mse))
 		    (p (f-significance (float f) dfg dfe t)))
-	       (values `((,DFG ,SSG ,MSG ,f ,p)
-			 (,DFE ,SSE ,MSE)
-			 (,DFT ,SST))
+	       (values `((,dfg ,ssg ,msg ,f ,p)
+			 (,dfe ,sse ,mse)
+			 (,dft ,sst))
 		       group-means
 		       (when scheffe-tests-p
-			 (scheffe-tests group-means group-sizes MSE DFE))
-		       SST-alt
+			 (scheffe-tests group-means group-sizes mse dfe))
+		       sst-alt
 		       (when (and (numberp confidence-intervals)
 				  (< 0.0 confidence-intervals 1.0))
 			 (let ((current-group '#:new)
@@ -149,7 +142,7 @@ representation.  See the manual for more information."
 					(confidence-interval-t-summaries
 					 mean
 					 (- n 1)
-					 ;; Standard shorthand for Variance,
+					 ;; standard shorthand for variance,
 					 ;; combined with division by n to get
 					 ;; std.  err.
 					 (sqrt (/ (- s2 (* n mean mean)) (* n (- n 1))))
@@ -189,21 +182,21 @@ representation.  See the manual for more information."
     (error 'insufficient-data))
   ;; These variable names aren't intuitive without reading the discussion in the
   ;; manual.
-  (let* ((N   (reduce #'+ data :key #'length))
-	 (TG  (reduce #'+ data :key #'(lambda (group) (reduce #'+ group))))
-	 (A   (reduce #'+ data :key #'(lambda (group)
+  (let* ((n   (reduce #'+ data :key #'length))
+	 (tg  (reduce #'+ data :key #'(lambda (group) (reduce #'+ group))))
+	 (a   (reduce #'+ data :key #'(lambda (group)
 					(reduce #'+ group :key #'square))))
-	 (B   (/ (square TG) N))
-	 (C   (reduce #'+ data :key #'(lambda (group)
+	 (b   (/ (square tg) n))
+	 (c   (reduce #'+ data :key #'(lambda (group)
 					(/ (square (reduce #'+ group))
 					   (length group)))))
-	 (SST (- A B))
-	 (SSG (- C B))
-	 (SSE (- A C)))
-    ;; The following two computations are for error checking.  See discussion in
-    ;; the manual.  SST-alt is returned as the last value.
-    (let* ((grand-mean (/ TG N))
-	   (SST-alt    (reduce #'+ data :key
+	 (sst (- a b))
+	 (ssg (- c b))
+	 (sse (- a c)))
+    ;; the following two computations are for error checking.  see discussion in
+    ;; the manual.  sst-alt is returned as the last value.
+    (let* ((grand-mean (/ tg n))
+	   (sst-alt    (reduce #'+ data :key
 			       #'(lambda (group)
 				   (reduce #'+ group :key
 					   #'(lambda (x)
@@ -211,25 +204,25 @@ representation.  See the manual for more information."
       (when (zerop sse)
 	(error 'zero-variance))
       ;; final calculations
-      (let* ((DFG (1- (length data)))
-	     (DFE (- N (length data)))
-	     (DFT (+ DFG DFE))
-	     (MSG (/ SSG DFG))
-	     (MSE (/ SSE DFE)))
-	;; Yes, it's correct to compute the f-significance by a one-tailed test,
-	;; because if H0 is false, F is known to be biased on the large side,
-	;; and so we're only interested in the upper tail of the F distribution.
+      (let* ((dfg (1- (length data)))
+	     (dfe (- n (length data)))
+	     (dft (+ dfg dfe))
+	     (msg (/ ssg dfg))
+	     (mse (/ sse dfe)))
+	;; yes, it's correct to compute the f-significance by a one-tailed test,
+	;; because if h0 is false, f is known to be biased on the large side,
+	;; and so we're only interested in the upper tail of the f distribution.
 	(let* ((f (/ msg mse))
 	       (p (f-significance (float f) dfg dfe t)))
-	  ;; Here's where we start consing.
+	  ;; here's where we start consing.
 	  (let ((group-means (map 'list #'mean data)))
-	    (values `((,DFG ,SSG ,MSG ,f ,p)
-		      (,DFE ,SSE ,MSE)
-		      (,DFT ,SST))
+	    (values `((,dfg ,ssg ,msg ,f ,p)
+		      (,dfe ,sse ,mse)
+		      (,dft ,sst))
 		    group-means
 		    (when scheffe-tests-p
 		      (scheffe-tests group-means (map 'list #'length data)
-				     MSE DFE))
+				     mse dfe))
 		    sst-alt
 		    (when (and (numberp confidence-intervals)
 			       (< 0.0 confidence-intervals 1.0))
@@ -244,27 +237,27 @@ representation.  See the manual for more information."
   "Prints `anova-table' on `stream.'"
   (case (length anova-table)
     ;; one-way anova has 3 lines
-    (3 (destructuring-bind ((DFG SSG MSG f p)
-			    (DFE SSE MSE)
-			    (DFT SST))
+    (3 (destructuring-bind ((dfg ssg msg f p)
+			    (dfe sse mse)
+			    (dft sst))
 			   anova-table
 	 (format stream "~2&")
 	 (format stream "~14@<~a~>~3@{~14:@<~a~>~}~%" "source of" "degrees of" "sum of" "mean")
-	 (format stream "~14@<~a~>~5@{~14:@<~a~>~}~%" "variation" "freedom" "squares" "square" "F" "p")
+	 (format stream "~14@<~a~>~5@{~14:@<~a~>~}~%" "variation" "freedom" "squares" "square" "f" "p")
 	 (format stream "~14@<~a~>~14:@<~5:d~>~3@{ ~12,2f ~} ~12,10f~%" "group" dfg ssg msg f p)
 	 (format stream "~14@<~a~>~14:@<~5:d~>~2@{ ~12,2f ~}~%" "error" dfe sse mse)
 	 (format stream "~14@<~a~>~14:@<~5:d~>~1@{ ~12,2f ~}~%" "total" dft sst)
 	 (format stream "~%")))
     ;; two-way anova has 5 lines
-    (5 (destructuring-bind ((DFAB SSAB MSAB FAB PAB)
-			    (DFA SSA MSA FA PA)
-			    (DFB SSB MSB FB PB)
-			    (DFE SSE MSE)
-			    (DFT SST))
+    (5 (destructuring-bind ((dfab ssab msab fab pab)
+			    (dfa ssa msa fa pa)
+			    (dfb ssb msb fb pb)
+			    (dfe sse mse)
+			    (dft sst))
 			   anova-table
 	 (format stream "~2&")
 	 (format stream "~14@<~a~>~3@{~14:@<~a~>~}~%" "source of" "degrees of" "sum of" "mean")
-	 (format stream "~14@<~a~>~5@{~14:@<~a~>~}~%" "variation" "freedom" "squares" "square" "F" "p")
+	 (format stream "~14@<~a~>~5@{~14:@<~a~>~}~%" "variation" "freedom" "squares" "square" "f" "p")
 	 (format stream "~14@<~a~>~14:@<~5:d~>~3@{ ~12,2f ~} ~12,10f~%" "interaction" dfab ssab msab fab pab)
 	 (format stream "~14@<~a~>~14:@<~5:d~>~3@{ ~12,2f ~} ~12,10f~%" "column"         dfa ssa msa fa pa)
 	 (format stream "~14@<~a~>~14:@<~5:d~>~3@{ ~12,2f ~} ~12,10f~%" "row"      dfb ssb msb fb pb)
@@ -286,59 +279,59 @@ size, and so the input is a three-dimensional array.
 The result of the analysis is an anova-table, as described in the manual.  This
 function differs from `anova-two-way-variables' only in its input
 representation.  See the manual for further discussion of analysis of variance."
-  (destructuring-bind (I J K) (array-dimensions data-array)
-    ;; Computing formulas from Devore, page 387, except I've pulled out the
-    ;; common subexpressions.  I know there's a lot of rightward creep here,
-    ;; because I used `let' instead of `let*' but I like making the data
+  (destructuring-bind (i j k) (array-dimensions data-array)
+    ;; computing formulas from devore, page 387, except i've pulled out the
+    ;; common subexpressions.  i know there's a lot of rightward creep here,
+    ;; because i used `let' instead of `let*' but i like making the data
     ;; dependencies clear.
-    (let ((IJK (* I J K))
-	  (IJ  (* I J))
-	  (JK  (* J K))
-	  (IK  (* I K)))
-      (let ((x+ (loop for index from 0 below IJK
+    (let ((ijk (* i j k))
+	  (ij  (* i j))
+	  (jk  (* j k))
+	  (ik  (* i k)))
+      (let ((x+ (loop for index from 0 below ijk
 		      summing (row-major-aref data-array index)))
-	    (x2+ (loop for index from 0 below IJK
+	    (x2+ (loop for index from 0 below ijk
 		       summing (square (row-major-aref data-array index))))
-	    (e2  (loop for ii from 0 below I summing
-		       (loop for jj from 0 below J summing
-			     (square (loop for kk from 0 below K
+	    (e2  (loop for ii from 0 below i summing
+		       (loop for jj from 0 below j summing
+			     (square (loop for kk from 0 below k
 					   summing (aref data-array ii jj kk))))))
-	    (a2  (loop for ii from 0 below I summing
-		       (square (loop for jj from 0 below J summing
-				     (loop for kk from 0 below K
+	    (a2  (loop for ii from 0 below i summing
+		       (square (loop for jj from 0 below j summing
+				     (loop for kk from 0 below k
 					   summing (aref data-array ii jj kk))))))
-	    (b2  (loop for jj from 0 below J summing
-		       (square (loop for ii from 0 below I summing
-				     (loop for kk from 0 below K
+	    (b2  (loop for jj from 0 below j summing
+		       (square (loop for ii from 0 below i summing
+				     (loop for kk from 0 below k
 					   summing (aref data-array ii jj kk)))))))
-	(let ((x+2/IJK (/ (square x+) IJK)))
-	  ;; Should we multiply through by IJK?  It doesn't save us computation, but
+	(let ((x+2/ijk (/ (square x+) ijk)))
+	  ;; should we multiply through by ijk?  it doesn't save us computation, but
 	  ;; it may improve numerical accuracy.  
-	  (let ((SST (- x2+ x+2/IJK))
-		(SSE (- x2+ (/ e2 K)))
-		(SSA (- (/ a2 JK) x+2/IJK))
-		(SSB (- (/ b2 IK) x+2/IJK)))
-	    (let ((SSAB (- SST SSA SSB SSE)))
-	      (let ((df-T  (- IJK 1))
-		    (df-E  (- IJK IJ))		; IJ*(K-1)
-		    (df-A  (- I 1))
-		    (df-B  (- J 1)) 
-		    (df-AB (- IJ I J -1)))	; (I-1)*(J-1)
-		(let ((MSE  (/ SSE df-E))
-		      (MSA  (/ SSA df-A))
-		      (MSB  (/ SSB df-B))
-		      (MSAB (/ SSAB df-AB)))
-		  (let ((FA  (/ MSA MSE))
-			(FB  (/ MSB MSE))
-			(FAB (/ MSAB MSE)))
-		    (let ((pA  (f-significance (float FA) df-A df-E t))
-			  (pB  (f-significance (float FB) df-B df-E t))
-			  (pAB (f-significance (float FAB) df-AB df-E t)))
-		      `((,df-AB ,SSAB ,MSAB ,FAB ,pAB)
-			(,df-A ,SSA ,MSA ,FA ,pA)
-			(,df-B ,SSB ,MSB ,FB ,pB)
-			(,df-E ,SSE ,MSE)
-			(,df-T ,SST)))))))))))))
+	  (let ((sst (- x2+ x+2/ijk))
+		(sse (- x2+ (/ e2 k)))
+		(ssa (- (/ a2 jk) x+2/ijk))
+		(ssb (- (/ b2 ik) x+2/ijk)))
+	    (let ((ssab (- sst ssa ssb sse)))
+	      (let ((df-t  (- ijk 1))
+		    (df-e  (- ijk ij))		; ij*(k-1)
+		    (df-a  (- i 1))
+		    (df-b  (- j 1)) 
+		    (df-ab (- ij i j -1)))	; (i-1)*(j-1)
+		(let ((mse  (/ sse df-e))
+		      (msa  (/ ssa df-a))
+		      (msb  (/ ssb df-b))
+		      (msab (/ ssab df-ab)))
+		  (let ((fa  (/ msa mse))
+			(fb  (/ msb mse))
+			(fab (/ msab mse)))
+		    (let ((pa  (f-significance (float fa) df-a df-e t))
+			  (pb  (f-significance (float fb) df-b df-e t))
+			  (pab (f-significance (float fab) df-ab df-e t)))
+		      `((,df-ab ,ssab ,msab ,fab ,pab)
+			(,df-a ,ssa ,msa ,fa ,pa)
+			(,df-b ,ssb ,msb ,fb ,pb)
+			(,df-e ,sse ,mse)
+			(,df-t ,sst)))))))))))))
 
 ;;; ---------------------------------------------------------------------------
 
@@ -348,10 +341,10 @@ and an element of `v2.' Returns a three-dimensional table of dv values."
   (let ((n (length dv)))
     (unless (= n (length iv1) (length iv2))
       (error 'unmatched-sequences))
-    ;; Faster implementations may be possible.
+    ;; faster implementations may be possible.
     (let ((iv1-values (extract-unique-values iv1))
 	  (iv2-values (extract-unique-values iv2)))
-      (let ((K (let ((k-temp 0)
+      (let ((k (let ((k-temp 0)
 		     (iv1-first (elt iv1-values 0))
 		     (iv2-first (elt iv2-values 0)))
 		 (map nil #'(lambda (iv1-elt iv2-elt)
@@ -363,19 +356,19 @@ and an element of `v2.' Returns a three-dimensional table of dv values."
 		 k-temp)))
 	(let ((table (make-array (list (length iv1-values)
 				       (length iv2-values)
-				       K)
+				       k)
 				 :element-type 't
 				 :initial-element nil)))
-          ;; I do not understand how a pairwise mapping across these iv2 and iv1 is supposed to
-          ;; fill the entire table. Don't we have to do a full map? Maybe it is just to late to
-          ;; be thinking about this. Check it tomorrow.
+          ;; i do not understand how a pairwise mapping across these iv2 and iv1 is supposed to
+          ;; fill the entire table. don't we have to do a full map? maybe it is just to late to
+          ;; be thinking about this. check it tomorrow.
 	  ;; construct data table
 	  (map nil #'(lambda (dv-value iv1-event iv2-event)
 		       (let ((i (position iv1-event iv1-values))
 			     (j (position iv2-event iv2-values)))
 			 ;; have to search for the first unfilled position.
-			 ;; Could be made more efficient with row-major-aref.
-			 (let ((pos (dotimes (x K)
+			 ;; could be made more efficient with row-major-aref.
+			 (let ((pos (dotimes (x k)
 				      (when (null (aref table i j x))
 					(return x)))))
 			   (if (null pos)
@@ -460,15 +453,15 @@ column effect is `iv2.'"
      
      (setf a-list (sort a-list #'string-lessp :key #'(lambda (x) (if (symbolp x) (symbol-name x) (format nil "~a" x)))))
      (setf b-list (sort b-list #'string-lessp :key #'(lambda (x) (if (symbolp x) (symbol-name x) (format nil "~a" x)))))
-     ;; Build the matrix by visiting each cell in each hash table and 
+     ;; build the matrix by visiting each cell in each hash table and 
      ;; calculating the means, at the same time, calculate the
      ;; harmonic mean of the sample sizes.
-     ;; The harmonic mean is given by the formula
+     ;; the harmonic mean is given by the formula
      ;; ab/sum\{1/sij\} where ab is the number of rows times the number
      ;; of columns and sij is the number of elements in cell i,j
      ;; the within-groups-subtractand is calculated here because the
      ;; cell counts are discarded after the ab-matrix is calculated and
-     ;; sij is in the denominator of the subtractand for the SS within
+     ;; sij is in the denominator of the subtractand for the ss within
      ;; groups.
      (let (row-totals
 	   column-totals
@@ -491,7 +484,7 @@ column effect is `iv2.'"
 	 (setf b-count 0)
 	 (dolist (b-key b-list)
 	   (setf b-value (gethash b-key a-value))
-           ;; How can this ever be true since b-key is mapped over b-list? - Westy
+           ;; how can this ever be true since b-key is mapped over b-list? - westy
 	   (when (not (member b-key b-list))
 	     (error 'missing-cell))
 	   (setf (aref ab-matrix b-count a-count)
@@ -517,9 +510,9 @@ column effect is `iv2.'"
 	     (incf sum-squared-cells (square cell))
              #+test
              (progn
-               ;; Testing
+               ;; testing
                (setf cell-count (aref cell-counts b a))
-               ;; Put the totals in the fringe of the array
+               ;; put the totals in the fringe of the array
                (incf (aref cell-counts b num-a) cell-count)
 	       (incf (aref cell-counts num-b a) cell-count)
                (incf (aref cell-counts num-b num-a) cell-count)))))
@@ -558,11 +551,11 @@ column effect is `iv2.'"
 	      (paxb (f-significance (float faxb) dfaxb dfe))
 	      (dft (+ dfa dfb dfaxb dfe))
 	      (sst (+ ssa ssb ssaxb sse)))
-	 (values `((,dfaxb ,SSAxB ,MSAxB ,FAxB ,pAxB)
-		   (,dfa ,SSA ,MSA ,FA ,pA)
-		   (,dfb ,SSB ,MSB ,FB ,pB)
-		   (,dfe ,SSE ,MSE)
-		   (,dfT ,SST))
+	 (values `((,dfaxb ,ssaxb ,msaxb ,faxb ,paxb)
+		   (,dfa ,ssa ,msa ,fa ,pa)
+		   (,dfb ,ssb ,msb ,fb ,pb)
+		   (,dfe ,sse ,mse)
+		   (,dft ,sst))
 		 ab-matrix row-totals column-totals grand-total
 		 a-list b-list #+test cell-counts)))))
 

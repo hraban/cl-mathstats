@@ -13,10 +13,10 @@ DISCUSSION
 |#
 (in-package common-lisp-user)
 
-(defpackage "CL-MATHSTATS"
-  (:use "COMMON-LISP" "METATILITIES" "CL-CONTAINERS")
-  (:nicknames "METABANG.MATH")
-  (:import-from "METATILITIES" 
+(defpackage #:cl-mathstats
+  (:use #:common-lisp #:metatilities #:cl-containers)
+  (:nicknames #:metabang.math)
+  (:import-from #:metatilities 
                 #:it #:self)
   (:export 
    #:transpose-matrix
@@ -112,7 +112,13 @@ DISCUSSION
    #:confidence-interval-t-summaries
    #:scheffe-tests
    #:r-score
-   #:smooth-4253H
+   #:smooth-4253h
    #:convert
    #:cross-product
-   #:dot-product))
+   #:dot-product)
+
+  (:export
+   #:with-temp-vector
+   #:with-temp-table
+   #:extract-unique-values))
+

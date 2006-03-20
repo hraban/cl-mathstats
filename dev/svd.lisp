@@ -23,7 +23,6 @@
 ;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ;;; --*--
 
-
 (in-package metabang.math)
 
 ;;; --*--
@@ -53,10 +52,10 @@ positive floats less than `max.'"
 ;;;
 ;;;--------------------------------------------------------------------------------
 
-(defmacro SIGN-df (a b)
+(defmacro sign-df (a b)
   `(if (>= ,b 0.0d0) (abs ,a) (- (abs ,a))))
 
-(defun PYTHAG-df (a b)
+(defun pythag-df (a b)
   "Computes square root of a*a + b*b without destructive overflow or underflow."
   (let ((at (abs a)) (bt (abs b)) (ct 0.0d0))
     (declare (double-float at bt ct))
@@ -68,7 +67,7 @@ positive floats less than `max.'"
 	   (* bt (sqrt (+ 1.0d0 (* ct ct)))))
 	  (t 0.0d0))))
 
-(defun svbksb-df (U W V m n B X &optional 
+(defun svbksb-df (u w v m n b x &optional 
 		  (tmp (make-array n :element-type 'double-float)))
   "Solves A X = B for a vector `X,' where A is specified by the mxn array U, `n'
 vector W, and nxn matrix V as returned by svdcmp.  `m' and `n' are the
@@ -83,19 +82,19 @@ It returns no values, storing the result in `X.' It does use some auxiliary
 storage, which can be passed in as `tmp,' a double-float array of length `n,' if
 you want to avoid consing."
   (let ((s 0.0d0))
-    (do ((j 1 (1+ j)))((> j n))			; Calculate U^T B
+    (do ((j 1 (1+ j)))((> j n))			; calculate u^t b
       (setf s 0.0d0)
-      (when (not (= (aref1 W j) 0.0d0))		; Nonzero result only if w(j) is non zero
-	(do ((i 1 (1+ i)))((> i m)) (incf s (* (aref11 U i j) (aref1 B i))))
-	(setf s (/ s (aref1 W j))))		; This is the divide by w(j)
+      (when (not (= (aref1 w j) 0.0d0))		; nonzero result only if w(j) is non zero
+	(do ((i 1 (1+ i)))((> i m)) (incf s (* (aref11 u i j) (aref1 b i))))
+	(setf s (/ s (aref1 w j))))		; this is the divide by w(j)
       (setf (aref1 tmp j) s))
-    (do ((j 1 (1+ j)))((> j n))			; Matrix Multiply by V to get answer
+    (do ((j 1 (1+ j)))((> j n))			; matrix multiply by v to get answer
       (setf s 0.0d0)
-      (do ((jj 1 (1+ jj)))((> jj n)) (incf s (* (aref11 V j jj) (aref1 tmp jj))))
-      (setf (aref1 X j) s))
+      (do ((jj 1 (1+ jj)))((> jj n)) (incf s (* (aref11 v j jj) (aref1 tmp jj))))
+      (setf (aref1 x j) s))
     (values)))
 
-(defun svdcmp-df (A M N W V &OPTIONAL
+(defun svdcmp-df (a m n w v &optional
 		  (rv1 (make-array n :element-type 'double-float)))
   "Given an `m'x`n' matrix `A,' this routine computes its singular value
 decomposition, A = U W V^T.  The matrix U replaces `A' on output.  The diagonal
@@ -119,133 +118,133 @@ array of length `n,' if you want to avoid consing."
       (setf (aref1 rv1 i) (* scale g))
       (setf g 0.0d0 s 0.0d0 scale 0.0d0)
       (when (<= i m)
-	(do ((k i (1+ k)))((> k m)) (incf scale (abs (aref11 A k i))))
+	(do ((k i (1+ k)))((> k m)) (incf scale (abs (aref11 a k i))))
 	(when (not (= scale 0.0d0))
 	  (do ((k i (1+ k)))((> k m))
-	    (setf (aref11 A k i) (/ (aref11 A k i) scale))
-	    (incf s (* (aref11 A k i) (aref11 A k i))))
-	  (setf f (aref11 A i i))
-	  (setf g (- (SIGN-df (sqrt s) f)))
+	    (setf (aref11 a k i) (/ (aref11 a k i) scale))
+	    (incf s (* (aref11 a k i) (aref11 a k i))))
+	  (setf f (aref11 a i i))
+	  (setf g (- (sign-df (sqrt s) f)))
 	  (setf h (- (* f g) s))
-	  (setf (aref11 A i i) (- f g))
+	  (setf (aref11 a i i) (- f g))
 	  (when (not (= i n))
 	    (do ((j l (1+ j)))((> j n))
 	      (setf s 0.0d0)
-	      (do ((k i (1+ k)))((> k m)) (incf s (* (aref11 A k i)
-						     (aref11 A k j))))
+	      (do ((k i (1+ k)))((> k m)) (incf s (* (aref11 a k i)
+						     (aref11 a k j))))
 	      (setf f (/ s h))
-	      (do ((k i (1+ k)))((> k m)) (incf (aref11 A k j) (* f
-								  (aref11 A k i))))))
-	  (do ((k i (1+ k)))((> k m)) (setf (aref11 A k i) (* (aref11 A
+	      (do ((k i (1+ k)))((> k m)) (incf (aref11 a k j) (* f
+								  (aref11 a k i))))))
+	  (do ((k i (1+ k)))((> k m)) (setf (aref11 a k i) (* (aref11 a
 								      k i) scale)))))
-      (setf (aref1 W i) (* scale g))
+      (setf (aref1 w i) (* scale g))
       (setf g 0.0d0 s 0.0d0 scale 0.0d0)
       (when (and (<= i m) (not (= i n)))
-	(do ((k l (1+ k)))((> k n)) (incf scale (abs (aref11 A i k))))
+	(do ((k l (1+ k)))((> k n)) (incf scale (abs (aref11 a i k))))
 	(when (not (= scale 0.0d0))
 	  (do ((k l (1+ k)))((> k n))
-	    (setf (aref11 A i k) (/ (aref11 A i k) scale))
-	    (incf s (* (aref11 A i k)(aref11 A i k))))
-	  (setf f (aref11 A i l))
-	  (setf g (- (SIGN-df (sqrt s) f)))
+	    (setf (aref11 a i k) (/ (aref11 a i k) scale))
+	    (incf s (* (aref11 a i k)(aref11 a i k))))
+	  (setf f (aref11 a i l))
+	  (setf g (- (sign-df (sqrt s) f)))
 	  (setf h (- (* f g) s))
-	  (setf (aref11 A i l) (- f g))
-	  (do ((k l (1+ k)))((> k n)) (setf (aref1 rv1 k) (/ (aref11 A i k) h)))
+	  (setf (aref11 a i l) (- f g))
+	  (do ((k l (1+ k)))((> k n)) (setf (aref1 rv1 k) (/ (aref11 a i k) h)))
 	  (when (not (= i m))
 	    (do ((j l (1+ j)))((> j m))
 	      (setf s 0.0d0)
-	      (do ((k l (1+ k)))((> k n)) (incf s (* (aref11 A j k)
-						     (aref11 A i k))))
-	      (do ((k l (1+ k)))((> k n)) (incf (aref11 A j k) (* s
+	      (do ((k l (1+ k)))((> k n)) (incf s (* (aref11 a j k)
+						     (aref11 a i k))))
+	      (do ((k l (1+ k)))((> k n)) (incf (aref11 a j k) (* s
 								  (aref1 rv1 k))))))
-	  (do ((k l (1+ k)))((> k n)) (setf (aref11 A i k) (* (aref11 A
+	  (do ((k l (1+ k)))((> k n)) (setf (aref11 a i k) (* (aref11 a
 								      i k) scale)))))
-      (setf anorm (max anorm (+ (abs (aref1 W i)) (abs (aref1 rv1 i))))))
-    ;;  Accumulation of right hand transformations
+      (setf anorm (max anorm (+ (abs (aref1 w i)) (abs (aref1 rv1 i))))))
+    ;;  accumulation of right hand transformations
     (do ((i n (1- i)))((< i 1))
       (when (< i n)
 	(when (not (= g 0.0d0))
-	  (do ((j l (1+ j)))((> j n))		; Double division to avoid possible underflow
-	    (setf (aref11 V j i) (/ (/ (aref11 A i j)(aref11 A i l)) g)))
+	  (do ((j l (1+ j)))((> j n))		; double division to avoid possible underflow
+	    (setf (aref11 v j i) (/ (/ (aref11 a i j)(aref11 a i l)) g)))
 	  (do ((j l (1+ j)))((> j n)) 
 	    (setf s 0.0d0)
-	    (do ((k l (1+ k)))((> k n)) (incf s (* (aref11 A i k) (aref11 V k j))))
-	    (do ((k l (1+ k)))((> k n)) (incf (aref11 V k j) (* s
-								(aref11 V k i))))))
-	(do ((j l (1+ j)))((> j n)) (setf (aref11 V i j) 0.0d0 (aref11
-								 V j i) 0.0d0)))
-      (setf (aref11 V i i) 1.0d0)
+	    (do ((k l (1+ k)))((> k n)) (incf s (* (aref11 a i k) (aref11 v k j))))
+	    (do ((k l (1+ k)))((> k n)) (incf (aref11 v k j) (* s
+								(aref11 v k i))))))
+	(do ((j l (1+ j)))((> j n)) (setf (aref11 v i j) 0.0d0 (aref11
+								 v j i) 0.0d0)))
+      (setf (aref11 v i i) 1.0d0)
       (setf g (aref1 rv1 i))
       (setf l i))
     ;;  Accumulation of left hand transformations
     (do ((i n (1- i)))((< i 1))
       (setf l (1+ i))
-      (setf g (aref1 W i))
+      (setf g (aref1 w i))
       (when (< i n)
-	(do ((j l (1+ j)))((> j n)) (setf (aref11 A i j) 0.0d0)))
+	(do ((j l (1+ j)))((> j n)) (setf (aref11 a i j) 0.0d0)))
       (if (not (= g 0.0d0))
 	  (progn
 	    (setf g (/ 1.0d0 g))
 	    (when (not (= i n))
 	      (do ((j l (1+ j)))((> j n))
 		(setf s 0.0d0)
-		(do ((k l (1+ k)))((> k m)) (incf s (* (aref11 A k i)
-						       (aref11 A k j))))
-		(setf f (* (/ s (aref11 A i i)) g))
-		(do ((k i (1+ k)))((> k m)) (incf (aref11 A k j) (* f
-								    (aref11 A k i))))))
-	    (do ((j i (1+ j)))((> j m)) (setf (aref11 A j i) (* (aref11 A j i) g))))
-	  (progn				; ELSE
-	    (do ((j i (1+ j)))((> j m)) (setf (aref11 A j i) 0.0d0))))
-      (incf (aref11 A i i)))
+		(do ((k l (1+ k)))((> k m)) (incf s (* (aref11 a k i)
+						       (aref11 a k j))))
+		(setf f (* (/ s (aref11 a i i)) g))
+		(do ((k i (1+ k)))((> k m)) (incf (aref11 a k j) (* f
+								    (aref11 a k i))))))
+	    (do ((j i (1+ j)))((> j m)) (setf (aref11 a j i) (* (aref11 a j i) g))))
+	  (progn				; else
+	    (do ((j i (1+ j)))((> j m)) (setf (aref11 a j i) 0.0d0))))
+      (incf (aref11 a i i)))
     ;;  Diagonalization of the Bidiagonal form
-    (do ((k n (1- k)))((< k 1))			;  Loop over singular values
-      (do ((its 1 (1+ its)))((> its 30))	;  Loop over allowed iterations
+    (do ((k n (1- k)))((< k 1))			;  loop over singular values
+      (do ((its 1 (1+ its)))((> its 30))	;  loop over allowed iterations
 	(setf flag 1)
-	;;  THESE C HACKING TURKEYS ARE USING FORCED EXIT TO SET THE value of l
+	;;  these c hacking turkeys are using forced exit to set the value of l
 	(setf l k)
 	(loop
 	  (if (< l 1) (return))
-	  (setf nm (- l 1))			; Note that rv1's first element is always zero
+	  (setf nm (- l 1))			; note that rv1's first element is always zero
 	  (when (= (+ (abs (aref1 rv1 l)) anorm) anorm)
 	    (setf flag 0)
 	    (return))
-	  (when (= (+ (abs (aref1 W nm)) anorm) anorm)
+	  (when (= (+ (abs (aref1 w nm)) anorm) anorm)
 	    (return))
 	  (decf l))
 	(when (not (= flag 0))
-	  (setf c 0.0d0)			; Cancellation of first element of rv1, if l > 1
+	  (setf c 0.0d0)			; cancellation of first element of rv1, if l > 1
 	  (setf s 1.0d0)
 	  (do ((i l (1+ i)))((> i k))
 	    (setf f (* s (aref1 rv1 i)))
 	    (when (not (= (+ (abs f) anorm) anorm))
-	      (setf g (aref1 W i))
-	      (setf h (PYTHAG-df f g))
-	      (setf (aref1 W i) h)
+	      (setf g (aref1 w i))
+	      (setf h (pythag-df f g))
+	      (setf (aref1 w i) h)
 	      (setf h (/ 1.0d0 h))
 	      (setf c (* g h))
 	      (setf s (- (* f h)))
 	      (do ((j 1 (1+ j)))((> j m))
-		(setf y (aref11 A j nm))
-		(setf z (aref11 A j i))
-		(setf (aref11 A j nm) (+ (* y c) (* z s)))
-		(setf (aref11 A j  i) (- (* z c) (* y s)))))))
-	(setf z (aref1 W k))
-	(when (= l k)				;  Convergence
-	  (when (< z 0.0d0)			; Singular value is made nonnegative
-	    (setf (aref1 W k) (- z))
-	    (do ((j 1 (1+ j)))((> j n)) (setf (aref11 V j k) (- (aref11 V j k)))))
+		(setf y (aref11 a j nm))
+		(setf z (aref11 a j i))
+		(setf (aref11 a j nm) (+ (* y c) (* z s)))
+		(setf (aref11 a j  i) (- (* z c) (* y s)))))))
+	(setf z (aref1 w k))
+	(when (= l k)				;  convergence
+	  (when (< z 0.0d0)			; singular value is made nonnegative
+	    (setf (aref1 w k) (- z))
+	    (do ((j 1 (1+ j)))((> j n)) (setf (aref11 v j k) (- (aref11 v j k)))))
 	  (return))
-	(when (= its 30) (error "No convergence in 30 SVDCMP iterations"))
-	(setf x (aref1 W l))			;  Shiftr from bottom 2-by-2 minor
+	(when (= its 30) (error "no convergence in 30 svdcmp iterations"))
+	(setf x (aref1 w l))			;  shiftr from bottom 2-by-2 minor
 	(setf nm (- k 1))
-	(setf y (aref1 W nm))
+	(setf y (aref1 w nm))
 	(setf g (aref1 rv1 nm))
 	(setf h (aref1 rv1 k))
 	(setf f (/ (+ (* (- y z)(+ y z)) (* (- g h) (+ g h))) (* 2.0d0 h y)))
-	(setf g (PYTHAG-df f 1.0d0))
-	(setf f (/ (+ (* (- x z)(+ x z)) (* h (- (/ y (+ f (SIGN-df g f))) h))) x))
-						; Next QR transformation
+	(setf g (pythag-df f 1.0d0))
+	(setf f (/ (+ (* (- x z)(+ x z)) (* h (- (/ y (+ f (sign-df g f))) h))) x))
+						; next qr transformation
 	(setf c 1.0d0 s 1.0d0)
 	(do ((j l (1+ j)))((> j nm))
 	  (setf i (1+ j))
@@ -253,7 +252,7 @@ array of length `n,' if you want to avoid consing."
 	  (setf y (aref1 w i))
 	  (setf h (* s g))
 	  (setf g (* c g))
-	  (setf z (PYTHAG-df f h))
+	  (setf z (pythag-df f h))
 	  (setf (aref1 rv1 j) z)
 	  (setf c (/ f z))
 	  (setf s (/ h z))
@@ -262,12 +261,12 @@ array of length `n,' if you want to avoid consing."
 	  (setf h (* y s))
 	  (setf y (* y c))
 	  (do ((jj 1 (1+ jj)))((> jj n))
-	    (setf x (aref11 V jj j))
-	    (setf z (aref11 V jj i))
-	    (setf (aref11 V jj j) (+ (* x c)(* z s)))
-	    (setf (aref11 V jj i) (- (* z c)(* x s))))
-	  (setf z (PYTHAG-df f h))
-	  (setf (aref1 W j) z)			; Rotation can be arbitrary if Z=0
+	    (setf x (aref11 v jj j))
+	    (setf z (aref11 v jj i))
+	    (setf (aref11 v jj j) (+ (* x c)(* z s)))
+	    (setf (aref11 v jj i) (- (* z c)(* x s))))
+	  (setf z (pythag-df f h))
+	  (setf (aref1 w j) z)			; rotation can be arbitrary if z=0
 	  (when (not (= z 0.0d0))   
 	    (setf z (/ 1.0d0 z))
 	    (setf c (* f z))
@@ -275,16 +274,16 @@ array of length `n,' if you want to avoid consing."
 	  (setf f (+ (* c g)(* s y)))
 	  (setf x (- (* c y)(* s g)))
 	  (do ((jj 1 (1+ jj)))((> jj m))
-	    (setf y (aref11 A jj j))
-	    (setf z (aref11 A jj i))
-	    (setf (aref11 A jj j) (+ (* y c)(* z s)))
-	    (setf (aref11 A jj i) (- (* z c)(* y s)))))
+	    (setf y (aref11 a jj j))
+	    (setf z (aref11 a jj i))
+	    (setf (aref11 a jj j) (+ (* y c)(* z s)))
+	    (setf (aref11 a jj i) (- (* z c)(* y s)))))
 	(setf (aref1 rv1 l) 0.0d0)
 	(setf (aref1 rv1 k) f)
 	(setf (aref1 w k) x))))
   (values))
 
-(defun svzero-df (w n threshold &OPTIONAL (report? t))
+(defun svzero-df (w n threshold &optional (report? t))
   "If the relative magnitude of an element in `w' compared to the largest
 element is less than `threshold,' then zero that element.  If `report?' is true,
 the indices of zeroed elements are printed.  Returns a list of the indices of
@@ -370,15 +369,15 @@ decomposition and backsubstitution routines directly."
   (let ((n (length w)))
     (do ((col 1 (1+ col))) ((> col n))
       (let ((s 0.0d0))
-	(do ((j 1 (1+ j)))((> j n))		; Calculate U^T B(col)
+	(do ((j 1 (1+ j)))((> j n))		; calculate u^t b(col)
 	  (setf s 0.0d0)
-	  (unless (= (aref1 W j) 0.0d0)		; Nonzero result only if w(j) is non zero
-	    (incf s (aref11 U col j))		;  and for the elt matching `col'
-	    (setf s (/ s (aref1 W j))))		; This is the divide by w(j)
+	  (unless (= (aref1 w j) 0.0d0)		; nonzero result only if w(j) is non zero
+	    (incf s (aref11 u col j))		;  and for the elt matching `col'
+	    (setf s (/ s (aref1 w j))))		; this is the divide by w(j)
 	  (setf (aref1 tmp j) s))
-	(do ((j 1 (1+ j)))((> j n))		; Matrix Multiply by V to get answer
+	(do ((j 1 (1+ j)))((> j n))		; matrix multiply by v to get answer
 	  (setf s 0.0d0)
-	  (do ((jj 1 (1+ jj)))((> jj n)) (incf s (* (aref11 V j jj) (aref1 tmp jj))))
+	  (do ((jj 1 (1+ jj)))((> jj n)) (incf s (* (aref11 v j jj) (aref1 tmp jj))))
 	  (setf (aref11 a-1 j col) s))))))
 
 #+test
@@ -424,10 +423,10 @@ tests the inverse-finding function.  The input is a random square matrix, with
 ;;;
 ;;;--------------------------------------------------------------------------------
 
-(defmacro SIGN-sf (a b)
+(defmacro sign-sf (a b)
   `(if (>= ,b 0.0) (abs ,a) (- (abs ,a))))
 
-(defun PYTHAG-sf (a b)
+(defun pythag-sf (a b)
   "Computes square root of a*a + b*b without destructive overflow or underflow."
   (let ((at (abs a)) (bt (abs b)) (ct 0.0))
     (declare (single-float at bt ct))
@@ -439,7 +438,7 @@ tests the inverse-finding function.  The input is a random square matrix, with
 	   (* bt (sqrt (+ 1.0 (* ct ct)))))
 	  (t 0.0))))
 
-(defun svbksb-sf (U W V m n B X &OPTIONAL
+(defun svbksb-sf (u w v m n b x &optional
 		  (tmp (make-array n :element-type 'single-float)))
   "Solves A X = B for a vector `X,' where A is specified by the mxn array U, `n'
 vector W, and nxn matrix V as returned by svdcmp.  `m' and `n' are the
@@ -454,19 +453,19 @@ It returns no values, storing the result in `X.' It does use some auxiliary
 storage, which can be passed in as `tmp,' a single-float array of length `n,' if
 you want to avoid consing."
   (let ((s 0.0))
-    (do ((j 1 (1+ j)))((> j n))		   ; Calculate U^T B
+    (do ((j 1 (1+ j)))((> j n))		   ; calculate u^t b
       (setf s 0.0)
-      (when (not (= (aref1 W j) 0.0))	   ; Nonzero result only if w(j) is non zero
-	(do ((i 1 (1+ i)))((> i m)) (incf s (* (aref11 U i j) (aref1 B i))))
-	(setf s (/ s (aref1 W j))))	   ; This is the divide by w(j)
+      (when (not (= (aref1 w j) 0.0))	   ; nonzero result only if w(j) is non zero
+	(do ((i 1 (1+ i)))((> i m)) (incf s (* (aref11 u i j) (aref1 b i))))
+	(setf s (/ s (aref1 w j))))	   ; this is the divide by w(j)
       (setf (aref1 tmp j) s))
-    (do ((j 1 (1+ j)))((> j n))			; Matrix Multiply by V to get answer
+    (do ((j 1 (1+ j)))((> j n))			; matrix multiply by v to get answer
       (setf s 0.0)
-      (do ((jj 1 (1+ jj)))((> jj n)) (incf s (* (aref11 V j jj) (aref1 tmp jj))))
-      (setf (aref1 X j) s)))
+      (do ((jj 1 (1+ jj)))((> jj n)) (incf s (* (aref11 v j jj) (aref1 tmp jj))))
+      (setf (aref1 x j) s)))
   (values))
 
-(defun svdcmp-sf (A M N W V &OPTIONAL
+(defun svdcmp-sf (a m n w v &optional
 		  (rv1 (make-array n :element-type 'single-float)))
   "Given an `m'x`n' matrix `A,' this routine computes its singular value
 decomposition, A = U W V^T.  The matrix U replaces `A' on output.  The diagonal
@@ -484,139 +483,139 @@ of single-floats."
 	(c 0.0)(f 0.0)(h 0.0)(s 0.0)(x 0.0)(y 0.0)(z 0.0)
 	(anorm 0.0)(g 0.0)(scale 0.0))
     (declare (fixnum flag i l nm))
-    (if (< m n) (error "SVDCMP: You must augment A with extra zero rows"))
-    ;; Householder reduction to bidiagonal form
+    (if (< m n) (error "svdcmp: you must augment a with extra zero rows"))
+    ;; householder reduction to bidiagonal form
     (do ((i 1 (1+ i)))((> i n))
       (setf l (+ i 1))
       (setf (aref1 rv1 i) (* scale g))
       (setf g 0.0 s 0.0 scale 0.0)
       (when (<= i m)
-	(do ((k i (1+ k)))((> k m)) (incf scale (abs (aref11 A k i))))
+	(do ((k i (1+ k)))((> k m)) (incf scale (abs (aref11 a k i))))
 	(when (not (= scale 0.0))
 	  (do ((k i (1+ k)))((> k m))
-	    (setf (aref11 A k i) (/ (aref11 A k i) scale))
-	    (incf s (* (aref11 A k i) (aref11 A k i))))
-	  (setf f (aref11 A i i))
-	  (setf g (- (SIGN-sf (sqrt s) f)))
+	    (setf (aref11 a k i) (/ (aref11 a k i) scale))
+	    (incf s (* (aref11 a k i) (aref11 a k i))))
+	  (setf f (aref11 a i i))
+	  (setf g (- (sign-sf (sqrt s) f)))
 	  (setf h (- (* f g) s))
-	  (setf (aref11 A i i) (- f g))
+	  (setf (aref11 a i i) (- f g))
 	  (when (not (= i n))
 	    (do ((j l (1+ j)))((> j n))
 	      (setf s 0.0)
-	      (do ((k i (1+ k)))((> k m)) (incf s (* (aref11 A k i)
-						     (aref11 A k j))))
+	      (do ((k i (1+ k)))((> k m)) (incf s (* (aref11 a k i)
+						     (aref11 a k j))))
 	      (setf f (/ s h))
-	      (do ((k i (1+ k)))((> k m)) (incf (aref11 A k j) (* f
-								  (aref11 A k i))))))
-	  (do ((k i (1+ k)))((> k m)) (setf (aref11 A k i) (* (aref11 A
+	      (do ((k i (1+ k)))((> k m)) (incf (aref11 a k j) (* f
+								  (aref11 a k i))))))
+	  (do ((k i (1+ k)))((> k m)) (setf (aref11 a k i) (* (aref11 a
 								      k i) scale)))))
-      (setf (aref1 W i) (* scale g))
+      (setf (aref1 w i) (* scale g))
       (setf g 0.0 s 0.0 scale 0.0)
       (when (and (<= i m) (not (= i n)))
-	(do ((k l (1+ k)))((> k n)) (incf scale (abs (aref11 A i k))))
+	(do ((k l (1+ k)))((> k n)) (incf scale (abs (aref11 a i k))))
 	(when (not (= scale 0.0))
 	  (do ((k l (1+ k)))((> k n))
-	    (setf (aref11 A i k) (/ (aref11 A i k) scale))
-	    (incf s (* (aref11 A i k)(aref11 A i k))))
-	  (setf f (aref11 A i l))
-	  (setf g (- (SIGN-sf (sqrt s) f)))
+	    (setf (aref11 a i k) (/ (aref11 a i k) scale))
+	    (incf s (* (aref11 a i k)(aref11 a i k))))
+	  (setf f (aref11 a i l))
+	  (setf g (- (sign-sf (sqrt s) f)))
 	  (setf h (- (* f g) s))
-	  (setf (aref11 A i l) (- f g))
-	  (do ((k l (1+ k)))((> k n)) (setf (aref1 rv1 k) (/ (aref11 A i k) h)))
+	  (setf (aref11 a i l) (- f g))
+	  (do ((k l (1+ k)))((> k n)) (setf (aref1 rv1 k) (/ (aref11 a i k) h)))
 	  (when (not (= i m))
 	    (do ((j l (1+ j)))((> j m))
 	      (setf s 0.0)
-	      (do ((k l (1+ k)))((> k n)) (incf s (* (aref11 A j k)
-						     (aref11 A i k))))
-	      (do ((k l (1+ k)))((> k n)) (incf (aref11 A j k) (* s
+	      (do ((k l (1+ k)))((> k n)) (incf s (* (aref11 a j k)
+						     (aref11 a i k))))
+	      (do ((k l (1+ k)))((> k n)) (incf (aref11 a j k) (* s
 								  (aref1 rv1 k))))))
-	  (do ((k l (1+ k)))((> k n)) (setf (aref11 A i k) (* (aref11 A
+	  (do ((k l (1+ k)))((> k n)) (setf (aref11 a i k) (* (aref11 a
 								      i k) scale)))))
-      (setf anorm (max anorm (+ (abs (aref1 W i)) (abs (aref1 rv1 i))))))
-    ;;  Accumulation of right hand transformations
+      (setf anorm (max anorm (+ (abs (aref1 w i)) (abs (aref1 rv1 i))))))
+    ;;  accumulation of right hand transformations
     (do ((i n (1- i)))((< i 1))
       (when (< i n)
 	(when (not (= g 0.0))
-	  (do ((j l (1+ j)))((> j n))	   ; Double division to avoid possible underflow
-	    (setf (aref11 V j i) (/ (/ (aref11 A i j)(aref11 A i l)) g)))
+	  (do ((j l (1+ j)))((> j n))	   ; double division to avoid possible underflow
+	    (setf (aref11 v j i) (/ (/ (aref11 a i j)(aref11 a i l)) g)))
 	  (do ((j l (1+ j)))((> j n)) 
 	    (setf s 0.0)
-	    (do ((k l (1+ k)))((> k n)) (incf s (* (aref11 A i k) (aref11 V k j))))
-	    (do ((k l (1+ k)))((> k n)) (incf (aref11 V k j) (* s
-								(aref11 V k i))))))
-	(do ((j l (1+ j)))((> j n)) (setf (aref11 V i j) 0.0 (aref11 V j i) 0.0)))
-      (setf (aref11 V i i) 1.0)
+	    (do ((k l (1+ k)))((> k n)) (incf s (* (aref11 a i k) (aref11 v k j))))
+	    (do ((k l (1+ k)))((> k n)) (incf (aref11 v k j) (* s
+								(aref11 v k i))))))
+	(do ((j l (1+ j)))((> j n)) (setf (aref11 v i j) 0.0 (aref11 v j i) 0.0)))
+      (setf (aref11 v i i) 1.0)
       (setf g (aref1 rv1 i))
       (setf l i))
-    ;;  Accumulation of left hand transformations
+    ;;  accumulation of left hand transformations
     (do ((i n (1- i)))((< i 1))
       (setf l (1+ i))
-      (setf g (aref1 W i))
+      (setf g (aref1 w i))
       (when (< i n)
-	(do ((j l (1+ j)))((> j n)) (setf (aref11 A i j) 0.0)))
+	(do ((j l (1+ j)))((> j n)) (setf (aref11 a i j) 0.0)))
       (if (not (= g 0.0))
 	  (progn
 	    (setf g (/ 1.0 g))
 	    (when (not (= i n))
 	      (do ((j l (1+ j)))((> j n))
 		(setf s 0.0)
-		(do ((k l (1+ k)))((> k m)) (incf s (* (aref11 A k i)
-						       (aref11 A k j))))
-		(setf f (* (/ s (aref11 A i i)) g))
-		(do ((k i (1+ k)))((> k m)) (incf (aref11 A k j) (* f
-								    (aref11 A k i))))))
-	    (do ((j i (1+ j)))((> j m)) (setf (aref11 A j i) (* (aref11 A j i) g))))
-	  (progn			   ; ELSE
-	    (do ((j i (1+ j)))((> j m)) (setf (aref11 A j i) 0.0))))
-      (incf (aref11 A i i)))
-    ;;  Diagonalization of the Bidiagonal form
-    (do ((k n (1- k)))((< k 1))		   ;  Loop over singular values
-      (do ((its 1 (1+ its)))((> its 30))   ;  Loop over allowed iterations
+		(do ((k l (1+ k)))((> k m)) (incf s (* (aref11 a k i)
+						       (aref11 a k j))))
+		(setf f (* (/ s (aref11 a i i)) g))
+		(do ((k i (1+ k)))((> k m)) (incf (aref11 a k j) (* f
+								    (aref11 a k i))))))
+	    (do ((j i (1+ j)))((> j m)) (setf (aref11 a j i) (* (aref11 a j i) g))))
+	  (progn			   ; else
+	    (do ((j i (1+ j)))((> j m)) (setf (aref11 a j i) 0.0))))
+      (incf (aref11 a i i)))
+    ;;  diagonalization of the bidiagonal form
+    (do ((k n (1- k)))((< k 1))		   ;  loop over singular values
+      (do ((its 1 (1+ its)))((> its 30))   ;  loop over allowed iterations
 	(setf flag 1)
-	;; THESE C HACKING TURKEYS ARE USING FORCED EXIT TO SET THE VALUE OF l
+	;; these c hacking turkeys are using forced exit to set the value of l
 	(setf l k)
 	(loop
 	  (if (< l 1) (return))
-	  (setf nm (- l 1))			; Note that rv1's first element is always zero
+	  (setf nm (- l 1))			; note that rv1's first element is always zero
 	  (when (= (+ (abs (aref1 rv1 l)) anorm) anorm)
 	    (setf flag 0)
 	    (return))
-	  (when (= (+ (abs (aref1 W nm)) anorm) anorm)
+	  (when (= (+ (abs (aref1 w nm)) anorm) anorm)
 	    (return))
 	  (decf l))
 	(when (not (= flag 0))
-	  (setf c 0.0)			   ;  Cancellation of first element of rv1, if l > 1
+	  (setf c 0.0)			   ;  cancellation of first element of rv1, if l > 1
 	  (setf s 1.0)
 	  (do ((i l (1+ i)))((> i k))
 	    (setf f (* s (aref1 rv1 i)))
 	    (when (not (= (+ (abs f) anorm) anorm))
-	      (setf g (aref1 W i))
-	      (setf h (PYTHAG-sf f g))
-	      (setf (aref1 W i) h)
+	      (setf g (aref1 w i))
+	      (setf h (pythag-sf f g))
+	      (setf (aref1 w i) h)
 	      (setf h (/ 1.0 h))
 	      (setf c (* g h))
 	      (setf s (- (* f h)))
 	      (do ((j 1 (1+ j)))((> j m))
-		(setf y (aref11 A j nm))
-		(setf z (aref11 A j i))
-		(setf (aref11 A j nm) (+ (* y c) (* z s)))
-		(setf (aref11 A j  i) (- (* z c) (* y s)))))))
-	(setf z (aref1 W k))
-	(when (= l k)			   ;  Convergence
-	  (when (< z 0.0)		   ;  Singular value is made nonnegative
-	    (setf (aref1 W k) (- z))
-	    (do ((j 1 (1+ j)))((> j n)) (setf (aref11 V j k) (- (aref11 V j k)))))
+		(setf y (aref11 a j nm))
+		(setf z (aref11 a j i))
+		(setf (aref11 a j nm) (+ (* y c) (* z s)))
+		(setf (aref11 a j  i) (- (* z c) (* y s)))))))
+	(setf z (aref1 w k))
+	(when (= l k)			   ;  convergence
+	  (when (< z 0.0)		   ;  singular value is made nonnegative
+	    (setf (aref1 w k) (- z))
+	    (do ((j 1 (1+ j)))((> j n)) (setf (aref11 v j k) (- (aref11 v j k)))))
 	  (return))
-	(when (= its 30) (error "No convergence in 30 SVDCMP iterations"))
-	(setf x (aref1 W l))		   ;  Shiftr from bottom 2-by-2 minor
+	(when (= its 30) (error "no convergence in 30 svdcmp iterations"))
+	(setf x (aref1 w l))		   ;  shiftr from bottom 2-by-2 minor
 	(setf nm (- k 1))
-	(setf y (aref1 W nm))
+	(setf y (aref1 w nm))
 	(setf g (aref1 rv1 nm))
 	(setf h (aref1 rv1 k))
 	(setf f (/ (+ (* (- y z)(+ y z)) (* (- g h) (+ g h))) (* 2.0 h y)))
-	(setf g (PYTHAG-sf f 1.0))
-	(setf f (/ (+ (* (- x z)(+ x z)) (* h (- (/ y (+ f (SIGN-sf g f))) h))) x))
-					   ; Next QR transformation
+	(setf g (pythag-sf f 1.0))
+	(setf f (/ (+ (* (- x z)(+ x z)) (* h (- (/ y (+ f (sign-sf g f))) h))) x))
+					   ; next qr transformation
 	(setf c 1.0 s 1.0)
 	(do ((j l (1+ j)))((> j nm))
 	  (setf i (1+ j))
@@ -624,7 +623,7 @@ of single-floats."
 	  (setf y (aref1 w i))
 	  (setf h (* s g))
 	  (setf g (* c g))
-	  (setf z (PYTHAG-sf f h))
+	  (setf z (pythag-sf f h))
 	  (setf (aref1 rv1 j) z)
 	  (setf c (/ f z))
 	  (setf s (/ h z))
@@ -633,12 +632,12 @@ of single-floats."
 	  (setf h (* y s))
 	  (setf y (* y c))
 	  (do ((jj 1 (1+ jj)))((> jj n))
-	    (setf x (aref11 V jj j))
-	    (setf z (aref11 V jj i))
-	    (setf (aref11 V jj j) (+ (* x c)(* z s)))
-	    (setf (aref11 V jj i) (- (* z c)(* x s))))
-	  (setf z (PYTHAG-sf f h))
-	  (setf (aref1 W j) z)		   ;  Rotation can be arbitrary if Z=0
+	    (setf x (aref11 v jj j))
+	    (setf z (aref11 v jj i))
+	    (setf (aref11 v jj j) (+ (* x c)(* z s)))
+	    (setf (aref11 v jj i) (- (* z c)(* x s))))
+	  (setf z (pythag-sf f h))
+	  (setf (aref1 w j) z)		   ;  rotation can be arbitrary if z=0
 	  (when (not (= z 0.0))   
 	    (setf z (/ 1.0 z))
 	    (setf c (* f z))
@@ -646,10 +645,10 @@ of single-floats."
 	  (setf f (+ (* c g)(* s y)))
 	  (setf x (- (* c y)(* s g)))
 	  (do ((jj 1 (1+ jj)))((> jj m))
-	    (setf y (aref11 A jj j))
-	    (setf z (aref11 A jj i))
-	    (setf (aref11 A jj j) (+ (* y c)(* z s)))
-	    (setf (aref11 A jj i) (- (* z c)(* y s)))))
+	    (setf y (aref11 a jj j))
+	    (setf z (aref11 a jj i))
+	    (setf (aref11 a jj j) (+ (* y c)(* z s)))
+	    (setf (aref11 a jj i) (- (* z c)(* y s)))))
 	(setf (aref1 rv1 l) 0.0)
 	(setf (aref1 rv1 k) f)
 	(setf (aref1 w k) x))))
@@ -689,7 +688,7 @@ random matrix, with dimensions `rows' and `cols.'"
 			    i j true test (abs (- true test)))))))
 	    (format t "done~2%")))))
 
-(defun svzero-sf (w n threshold &OPTIONAL (report? t))
+(defun svzero-sf (w n threshold &optional (report? t))
   "If the relative magnitude of an element in `w' compared to the largest
 element is less than `threshold,' then zero that element.  If `report?' is true,
 the indices of zeroed elements are printed.  Returns a list of indices of the
@@ -707,8 +706,8 @@ zeroed elements.  This routine uses single-floats."
 
 
 (defun svd-inverse-slow-sf (u w v &optional
-			    (a-1 (make-array (list (length w) (length w))
-					     :element-type 'single-float)))
+			      (a-1 (make-array (list (length w) (length w))
+					       :element-type 'single-float)))
   "Computes the inverse of a matrix that has been decomposed into `u,' `w' and
 `v' by singular value decomposition.  It assumes the ``small'' elements of `w'
 have already been zeroed.  It computes the inverse by constructing a diagonal
@@ -721,12 +720,12 @@ decomposition and backsubstitution routines directly."
     (dotimes (i n)
       (let ((x (aref w i)))
 	(if (zerop x)
-	    (setf (aref w2 i i) 0.0)
-	    (setf (aref w2 i i) (/ x)))))
+          (setf (aref w2 i i) 0.0)
+          (setf (aref w2 i i) (/ x)))))
     (multiply-matrices
-      (multiply-matrices v w2)
-      (transpose-matrix u)
-      a-1)))
+     (multiply-matrices v w2)
+     (transpose-matrix u)
+     a-1)))
 
 #+test
 (defun test-svd-inverse-slow-sf (rank &optional (tol 0.001))
@@ -776,15 +775,15 @@ decomposition and backsubstitution routines directly."
   (let ((n (length w)))
     (do ((col 1 (1+ col))) ((> col n))
       (let ((s 0.0))
-	(do ((j 1 (1+ j)))((> j n))		; Calculate U^T B(col)
+	(do ((j 1 (1+ j)))((> j n))		; calculate u^t b(col)
 	  (setf s 0.0)
-	  (unless (= (aref1 W j) 0.0)		; Nonzero result only if w(j) is non zero
-	    (incf s (aref11 U col j))		;  and for the elt matching `col'
-	    (setf s (/ s (aref1 W j))))		; This is the divide by w(j)
+	  (unless (= (aref1 w j) 0.0)		; nonzero result only if w(j) is non zero
+	    (incf s (aref11 u col j))		;  and for the elt matching `col'
+	    (setf s (/ s (aref1 w j))))		; this is the divide by w(j)
 	  (setf (aref1 tmp j) s))
-	(do ((j 1 (1+ j)))((> j n))		; Matrix Multiply by V to get answer
+	(do ((j 1 (1+ j)))((> j n))		; matrix multiply by v to get answer
 	  (setf s 0.0)
-	  (do ((jj 1 (1+ jj)))((> jj n)) (incf s (* (aref11 V j jj) (aref1 tmp jj))))
+	  (do ((jj 1 (1+ jj)))((> jj n)) (incf s (* (aref11 v j jj) (aref1 tmp jj))))
 	  (setf (aref11 a-1 j col) s))))))
 
 #+test
@@ -832,9 +831,9 @@ you have already consed up these matrices, you should call `svdcmp-sf' or
 `svdcmp-df' directly.  The input matrix is preserved."
   (destructuring-bind (m n) (array-dimensions matrix)
     (let ((type (array-element-type matrix)))
-      (let ((U (make-array (list m n) :element-type type))
-	    (W (make-array n :element-type type))
-	    (V (make-array (list n n) :element-type type)))
+      (let ((u (make-array (list m n) :element-type type))
+	    (w (make-array n :element-type type))
+	    (v (make-array (list n n) :element-type type)))
 	(dotimes (i (* m n))
 	  (setf (row-major-aref u i)
 		(row-major-aref matrix i)))
@@ -916,7 +915,7 @@ supplied as the third argument."
 
 ;;; ============================================================================
 
-(defun svd-matrix-inverse (A &optional (singularity-threshold 1.0d-10))
+(defun svd-matrix-inverse (a &optional (singularity-threshold 1.0d-10))
   "Use singular value decomposition to compute the inverse of `A.' If an exact
 inverse is not possible, then zero the otherwise infinite inverted singular
 value and compute the inverse.  The inverse is returned; `A' is not destroyed.
@@ -925,12 +924,12 @@ computing the singular value decomposition and using it several times, because
 this function computes it anew each time."
   (let* ((u    (copy-array a))
 	 (type (array-element-type a))
-	 (m    (array-dimension U 0))
-	 (n    (array-dimension U 1))
-	 (W    (make-array n :element-type type))
-	 (RV   (make-array n :element-type type))
-	 (V    (make-array (list n n) :element-type type))
-	 (A-1  (make-array (array-dimensions a) :element-type type)))
+	 (m    (array-dimension u 0))
+	 (n    (array-dimension u 1))
+	 (w    (make-array n :element-type type))
+	 (rv   (make-array n :element-type type))
+	 (v    (make-array (list n n) :element-type type))
+	 (a-1  (make-array (array-dimensions a) :element-type type)))
     (ecase type
       (single-float (svdcmp-sf u m n w v rv)
 		    (svzero-sf w n singularity-threshold)
@@ -940,5 +939,3 @@ this function computes it anew each time."
 		    (svd-inverse-fast-df u w v a-1 rv)))
     a-1))
 
-;;; ***************************************************************************
-;;; EOF

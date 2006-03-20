@@ -1,9 +1,5 @@
 (in-package metabang.math)
 
-(export '(with-temp-vector
-           with-temp-table
-           extract-unique-values))
-
 (defvar *temporary-vector* nil
   "A temporary vector for use by statistical functions such as `quantile,' which
 uses it for sorting data.  This avoids consing or rearranging the user's data.")

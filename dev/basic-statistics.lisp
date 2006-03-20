@@ -1043,23 +1043,23 @@ should always be run first, to see if there are any significant differences."
   #-(or allegro lucid)(check-type ms-error real)
   ;; by using `elt,' we sacrifice some efficiency on lists, but it should be
   ;; fairly inconsequential, given that the algorihtm is already O(n^2).
-  (let ((N (length group-means)))
-    (when (/= N (length group-sizes))
+  (let ((n (length group-means)))
+    (when (/= n (length group-sizes))
       (error 'unmatched-sequences))
-    (let ((N-1 (- N 1)))
-      (loop for i from 0 below N-1 collecting
+    (let ((n-1 (- n 1)))
+      (loop for i from 0 below n-1 collecting
 	    (let ((mean-i (elt group-means i))
-		  (Ni     (elt group-sizes i)))
-	      (loop for j from (1+ i) to N-1 collect
+		  (ni     (elt group-sizes i)))
+	      (loop for j from (1+ i) to n-1 collect
 		    ;; Formula from Cohen.  Rather than compute 1/Ni + 1/Nj,
 		    ;; which we know will turn into a rational because Ni and Nj
 		    ;; are integers, we directly compute (Nj + Ni)/(* Ni Nj)
 		    (let* ((mean-j (elt group-means j))
-			   (Nj     (elt group-sizes j))
-			   (F      (/ (square (- mean-i mean-j))
-				      (* ms-error N-1 (/ (+ Ni Nj)
-							 (* Ni Nj))))))
-		      (list F (f-significance (float f) n-1 df-error t)))))))))
+			   (nj     (elt group-sizes j))
+			   (f      (/ (square (- mean-i mean-j))
+				      (* ms-error n-1 (/ (+ ni nj)
+							 (* ni nj))))))
+		      (list f (f-significance (float f) n-1 df-error t)))))))))
 
 ;;; ---------------------------------------------------------------------------
 
@@ -1069,20 +1069,20 @@ should always be run first, to see if there are any significant differences."
 groups, the Scheffe table prints as an n-1 x n-1 upper-triangular table.  If
 `group-means' is given, it should be a list of the group means, which will be
 printed along with the table."
-  (let ((N (length scheffe-table)))
+  (let ((n (length scheffe-table)))
     (if (null group-means)
-	;; First column is 4 chars wide; the rest are 18 chars wide.
+	;; first column is 4 chars wide; the rest are 18 chars wide.
 	(progn (format stream "~2&~5t")
-	       (loop for row-number from 1 to N do
+	       (loop for row-number from 1 to n do
 		     (format stream "~18:@<~d~>| " row-number))
 	       (format stream "~%")
 	       (loop for row in scheffe-table
 		     for row-number from 0 do
 		     (format stream "~2d: ~vt~{~{~8,1f ~8,6f | ~}~}~%"
 			     row-number (+ 5 (* 20 row-number)) row)))
-	;; First column is 12 chars wide; the rest are 18 chars wide.
+	;; first column is 12 chars wide; the rest are 18 chars wide.
 	(progn (format stream "~2&~13t")
-	       (loop for row-number from 1 to N do
+	       (loop for row-number from 1 to n do
 		     (format stream "~18:@<~10g~>| "
 			     (elt group-means row-number)))
 	       (format stream "~%")

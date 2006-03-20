@@ -1,39 +1,3 @@
-;;;; -*- Mode:Common-Lisp; Package:eksl-utilities; Base:10 -*-
-;;;; *-* File: eksl-math:density-fns.lisp *-*
-;;;; *-* Last-edit: Tuesday, June 28, 2005 11:35:52; Edited-By: Gary *-* 
-;;;; *-* Machine: billy-pilgrim *-*
-;;;; *-* Software: Macintosh Common Lisp, Version 5.1b4 *-*
-;;;; *-* Lisp: Macintosh Common Lisp, Version 5.1b4 *-*
-
-;;;; **************************************************************************
-;;;; **************************************************************************
-;;;; *                                                                        *
-;;;; *                      Probability Density Functions                     *
-;;;; *                                                                        *
-;;;; **************************************************************************
-;;;; **************************************************************************
-;;;
-;;; Copyright (c) 1990 - 1994 University of Massachusetts
-;;; Department of Computer Science
-;;; Experimental Knowledge Systems Laboratory
-;;; Professor Paul Cohen, Director.
-;;; All rights reserved.
-
-;;; Permission to use, copy, modify and distribute this software and its
-;;; documentation is hereby granted without fee, provided that the above
-;;; copyright notice of EKSL, this paragraph and the one following appear
-;;; in all copies and in supporting documentation.
-;;; EKSL makes no representation about the suitability of this software for any
-;;; purposes.  It is provided "AS IS", without express or implied warranties
-;;; including (but not limited to) all implied warranties of merchantability
-;;; and fitness for a particular purpose, and notwithstanding any other
-;;; provision contained herein.  In no event shall EKSL be liable for any
-;;; special, indirect or consequential damages whatsoever resulting from loss
-;;; of use, data or profits, whether in an action of contract, negligence or
-;;; other tortuous action, arising out of or in connection with the use or
-;;; performance of this software, even if EKSL is advised of the possiblity of
-;;; such damages.
-
 (in-package metabang.math)
 
 ;;; --*--
@@ -356,7 +320,7 @@ manual for more information."
 	      (unless (zerop a1)
 		(setf fac (/ 1.0 a1)
 		      g   (* b1 fac))
-		(if (< (abs (/ (- g gold) g)) EPS)
+		(if (< (abs (/ (- g gold) g)) eps)
 		    (let ((result (underflow-goes-to-zero
 				   (* (safe-exp (- (* a (log x)) x gln)) g))))
 		      (return-from
@@ -588,8 +552,8 @@ All arguments must be floating-point numbers; `a' and `b' must be positive and
    (flet ((betacf (a b x)
 	    ;; straight from Numerical Recipes in C, section 6.3
 	    (declare (type float a b x))
-	    (let ((ITMAX 100)
-		  (EPS   3.0e-7)
+	    (let ((itmax 100)
+		  (eps   3.0e-7)
 		  (qap 0.0) (qam 0.0) (qab 0.0) (em  0.0) (tem 0.0) (d 0.0)
 		  (bz  0.0) (bm  1.0) (bp  0.0) (bpp 0.0)
 		  (az  1.0) (am  1.0) (ap  0.0) (app 0.0) (aold 0.0))
@@ -599,7 +563,7 @@ All arguments must be floating-point numbers; `a' and `b' must be positive and
 		    qap (+ a 1.0)
 		    qam (- a 1.0)
 		    bz  (- 1.0 (/ (* qab x) qap)))
-	      (dotimes (m ITMAX)
+	      (dotimes (m itmax)
 		(setf em   (float (1+ m))
 		      tem  (+ em em)
 		      d    (/ (* em (- b em) x)
@@ -615,9 +579,9 @@ All arguments must be floating-point numbers; `a' and `b' must be positive and
 		      bm   (/ bp bpp)
 		      az   (/ app bpp)
 		      bz   1.0)
-		(if (< (abs (- az aold)) (* EPS (abs az)))
+		(if (< (abs (- az aold)) (* eps (abs az)))
 		    (return-from betacf az)))
-	      (error "a=~s or b=~s too big, or ITMAX too small in BETACF"
+	      (error "a=~s or b=~s too big, or itmax too small in betacf"
 		     a b))))
       (declare (notinline betacf))
       (when (or (< x 0.0) (> x 1.0))
