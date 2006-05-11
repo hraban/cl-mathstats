@@ -13,7 +13,7 @@ Author: Gary King
 DISCUSSION
 
 |#
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 #+Test
 (defun compare-smoothers (data)

@@ -1,4 +1,4 @@
-(in-package cl-mathstats)
+(in-package #:cl-mathstats)
 
 (defcondition data-error (error) 
   ())

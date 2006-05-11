@@ -30,7 +30,7 @@
 ;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ;;; --*--
 
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 (defun times2 (i &optional (power 1))
   "Multiply `i' by a power of 2."

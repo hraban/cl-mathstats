@@ -1,4 +1,4 @@
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 (declaim (inline ensure-float)) 
 (defun ensure-float (number)

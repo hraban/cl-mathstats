@@ -11,7 +11,7 @@ Author: Gary King
 DISCUSSION
 
 |#
-(in-package common-lisp-user)
+(in-package #:common-lisp-user)
 
 (defpackage #:cl-mathstats
   (:use #:common-lisp #:metatilities #:cl-containers)

@@ -6,7 +6,7 @@ Author: EKSL Utilities
 
 |#
 
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 (define-statistic anova-one-way-variables ()
    ((anova-table)

@@ -1,4 +1,4 @@
-(in-package cl-mathstats-test)
+(in-package #:cl-mathstats-test)
 
 (deftestsuite test-cl-mathstats () ())
 

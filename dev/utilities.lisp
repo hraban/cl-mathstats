@@ -1,4 +1,4 @@
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 (defvar *temporary-vector* nil
   "A temporary vector for use by statistical functions such as `quantile,' which

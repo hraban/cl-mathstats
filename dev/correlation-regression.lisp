@@ -13,7 +13,7 @@ Author: EKSL Group
 DISCUSSION
 
 |#
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 ;;; ---------------------------------------------------------------------------
 ;;; correlation, various types

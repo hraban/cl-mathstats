@@ -4,7 +4,7 @@
 
 |#
 
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 ;;; ---------------------------------------------------------------------------
 ;;; SIMPLE STATISTICS

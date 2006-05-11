@@ -39,7 +39,7 @@
 ;;;
 ;;; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 (defmacro check-type-of-arg (arg-name predicate type-string &optional error-type-name)
   "Generate error if the value of ARG-NAME doesn't satisfy PREDICATE.

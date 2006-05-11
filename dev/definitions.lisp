@@ -13,7 +13,7 @@ Author: Gary King
 DISCUSSION
 
 |#
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 (defconstant +0degrees+   (degrees->radians 0))
 (defconstant +5degrees+   (degrees->radians 5))

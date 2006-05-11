@@ -14,7 +14,7 @@ DISCUSSION
 
 |#
 
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 
 (defmacro with-routine-error-handling (&body body)

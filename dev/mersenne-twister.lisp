@@ -1,4 +1,4 @@
-(in-package metabang.math)
+(in-package #:metabang.math)
 
 #|
 tests
