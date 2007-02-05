@@ -77,11 +77,13 @@ Implementation is loosely based on Numerical Recipes in C, section 6.1.  On the
 TI Explorer, the largest argument that won't cause a floating overflow is 170."
   (check-type n fixnum)
   (let ((cache (load-time-value
-		 ;; On the TI, 34! is the largest factorial representable as a single-float
-		 (let ((a (make-array 35 :element-type 'single-float)))
-		   (dotimes (n 35)
-		     (setf (aref a n) (coerce (factorial-exact n) 'single-float)))
-		   a))))
+		;; On the TI, 34! is the largest factorial representable
+		;; as a single-float
+		(let ((a (make-array 35 :element-type 'single-float)))
+		  (dotimes (n 35)
+		    (setf (aref a n) 
+			  (coerce (factorial-exact n) 'single-float)))
+		  a))))
     (cond ((< n 0)
 	   (error "N cannot be negative:  ~d" n))
 	  ((< n (length cache))
