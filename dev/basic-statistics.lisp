@@ -327,7 +327,6 @@ function must produce numbers.  Consider `sxhash' if no better function is
 available.  Also returns the number of occurrences of the mode.  If there is
 more than one mode, this returns the first mode, as determined by the sorting of
 the numbers."
-  (declare #-(or DIGITOOL OPENMCL) (values element number-of-occurrences))
   (check-type data sequence)
   (let* ((n (apply #'data-length data standard-args))
 	 (start2 (or start 0))
@@ -397,7 +396,6 @@ than the window size (currently defaults to 10% of the size of the data) this
 function will blindly pick the first one. If this is the case you probabaly
 should be calling `mode' instead of this function."
   
-  (declare #-(or DIGITOOL OPENMCL) (values element number-of-occurrences))
   (check-type data sequence)
   (when (not (data-continuous-p data))
     (warn 'seems-to-be-discrete))
@@ -551,7 +549,6 @@ range is the difference between the 3/4 quantile (the upper quartile) and the
   "Computes a Tukey five-number summary of the data.  That is, it returns, in
 increasing order, the extremes and the quartiles: the minimum, the 1/4 quartile,
 the median, the 3/4 quartile, and the maximum."
-  (declare #-(or DIGITOOL OPENMCL) (values minimum first-quartile median third-quartile maximum))
   (check-type data sequence)
   (let* ((n (apply #'data-length data standard-args))
 	 (start2 (or start 0))
@@ -586,10 +583,7 @@ the median, the 3/4 quartile, and the maximum."
   "Compute the length, minimum, maximum, range, median, mode, mean, variance,
 standard deviation, and interquartile-range of `sequence' from `start' to `end',
 accessed by `key'."
-  (declare (ignore start end)
-           #-(or DIGITOOL OPENMCL)
-	   (values length minimum maximum range median mode mean
-		   variance standard-deviation interquartile-range))
+  (declare (ignore start end))
   (let* ((length   (apply #'data-length data standard-args))
 	 (minimum  (apply #'minimum data standard-args))
 	 (maximum  (apply #'maximum data standard-args))
@@ -636,9 +630,7 @@ of numbers.  Let D be the sample mean.  The null hypothesis is that D equals the
 The function also returns the significance, the standard error, and the degrees
 of freedom.  Signals `zero-variance' if that condition occurs.  Signals
 `insufficient-data' unless there are at least two elements in the sample."
-  (declare (ignore start end key)
-           #-(or DIGITOOL OPENMCL)
-	   (values t-statistic significance sample-error dof))
+  (declare (ignore start end key))
   (let ((n (apply #'data-length data standard-args)))
     (when (zerop n)
       (error 'no-data))
@@ -666,7 +658,6 @@ D/=0, `:positive' means D>0, and `:negative' means D<0.  Unless you're using
 The function also returns the significance, the standard error, and the degrees
 of freedom.  Signals `standard-error-is-zero' if that condition occurs.  Signals
 `insufficient-data' unless there are at least two elements in each sample."
-  (declare #-(or DIGItOOL OPENMCL) (values t-statistic significance std-error dof))
   (check-type tails (member :both :positive :negative))
   (let ((n1 (data-length sample-1))
 	(n2 (data-length sample-2)))
@@ -704,7 +695,6 @@ positive, D is negative, and D is either, and they are selected by the `tails'
 parameter, which must be :positive, :negative, or :both, respectively.  We count
 the number of chance occurrences of D in the desired rejection region, and
 return the estimated probability."
-  (declare #-(or DIGITOOL OPENMCL) (values D significance count))
   (check-type sample-1 sequence)
   (check-type sample-2 sequence)
   (check-type tails (member :both :positive :negative))
@@ -770,7 +760,6 @@ careful what order the two samples are in: it matters!
 The function also returns the significance, the standard error, and the degrees
 of freedom.  Signals `standard-error-is-zero' if that condition occurs.  Signals
 `insufficient-data' unless there are at least two elements in each sample."
-  (declare #-(or DIGITOOL OPENMCL) (values t-statistic significance std-error dof))
   (let* ((n1 (data-length sample1))
 	 (n2 (data-length sample2)))
     (unless (= n1 n2)
@@ -787,10 +776,7 @@ of freedom.  Signals `standard-error-is-zero' if that condition occurs.  Signals
   ((data 'sequence))
   (data tails &optional (h0-mean 0) (h0-std-dev 1)
         &rest standard-args &key start end key)
-  ;; BAH 7 April 2001 (added 'tails' to prevent warning during compilation)
-  (declare (ignore start end key tails) 
-           #-(OR DIGITOOL OPENMCL)
-           (values z-statistic significance))
+  (declare (ignore start end key tails) )
   (let ((n (apply #'data-length data standard-args)))
     (when (zerop n)
       (error 'no-data))
@@ -911,7 +897,6 @@ consistent with those confidence intervals.  This function handles 90, 95 and 99
 percent confidence intervals as special cases, so those will be quite fast.
 `Sample' should be a sequence of numbers.  `Confidence' should be a number
 between 0 and 1, exclusive."
-   (declare #-(OR DIGITOOL OPENMCL) (values mean lower upper))
    (check-type data sequence)
    ;; The Allegro compiler barfs on this...
    ;; It generates this erroneous code...
@@ -968,7 +953,6 @@ two numbers are necessary, but the confidence intervals of other statistics may
 be asymmetrical and these values would be consistent with those confidence
 intervals.  `Sample' should be a sequence of numbers.  `Confidence' should be a
 number between 0 and 1, exclusive."
-  (declare #-(OR DIGITOOL OPENMCL) (values mean lower upper))
   (check-type data sequence)
   ;; The Allegro compiler barfs on this...
   ;; It generates this erroneous code...
@@ -992,7 +976,6 @@ the number of degrees of freedom in estimating the mean; and the
 the mean of a t-distribution, which may be the slope parameter of a regression,
 the difference between two means, or other practical t-distributions.
 `Confidence' should be a number between 0 and 1, exclusive."
-  (declare #-(or DIGITOOL OPENMCL) (values mean lower upper))
   #-(or allegro lucid)(check-type dof (real 1 *))
   #-(or allegro lucid)(check-type mean real)
   #-(or allegro lucid)(check-type standard-error real)
@@ -1021,7 +1004,6 @@ function is not appropriate for small samples with p-hat far from 1/2: `x'
 should be at least 5, and so should `n'-`x.' This function returns three values:
 p-hat, and the lower and upper bounds of the confidence interval.  `Confidence'
 should be a number between 0 and 1, exclusive."
-   (declare #-(OR DIGITOOL OPENMCL) (values p-hat lower upper))
    ;; This formula is from DeVore, page 331
    (let ((p-hat          (/ x n))
 	 (standard-error (sqrt (/ (* x (- n x)) (* n n n)))))
@@ -1158,7 +1140,6 @@ Formula: Sum(X)."
 is nil, the correction for continuity is not done; default is t.
 
 Returns the chi-square statistic and the significance of the value."
-  (declare #-(or DIGITOOL OPENMCL) (values chi2 p-value))
   (check-type a integer)
   (check-type b integer)
   (check-type c integer)
@@ -1184,8 +1165,6 @@ Returns the chi-square statistic and the significance of the value."
 will construct a 2x2 contingency table by counting the number of occurrences of
 each combination of the variables.  See the manual for more details."
   ;; Better, non-consing algorithms certainly exist, but I don't have time now.
-  (declare #-(or DIGITOOL OPENMCL) (values chi-square significance contingency-table
-		   v1-values v2-values))
   (multiple-value-bind (2x2-table v1-values v2-values)
       (make-contingency-table v1 v2)
     (unless (equal '(2 2) (array-dimensions 2x2-table))
@@ -1204,7 +1183,6 @@ each combination of the variables.  See the manual for more details."
   "Calculates the chi-square statistic and corresponding p-value for the given
 contingency table.  The result says whether the row factor is independent of the
 column factor.  Does not apply Yate's correction."
-  (declare #-(or DIGITOOL OPENMCL) (values chi-square p-value))
   (check-type contingency-table (array * 2))
   (destructuring-bind (rows cols) (array-dimensions contingency-table)
     (macrolet ((row-sum (row)
@@ -1236,7 +1214,6 @@ column factor.  Does not apply Yate's correction."
 (defun make-contingency-table (v1 v2)
   "Counts each unique combination of an element of `v1' and an element of `v2.'
 Returns a two-dimensional table of integers."
-  (declare #-(or DIGITOOL OPENMCL) (values table v1-values v2-values))
   (let ((n (length v1)))
     (when (/= n (length v2))
       (error 'unmatched-sequences))
@@ -1266,8 +1243,6 @@ Returns a two-dimensional table of integers."
 `v2.' These should be categorial variables; the function will construct a
 contingency table by counting the number of occurrences of each combination of
 the variables.  See the manual for more details."
-  (declare #-(or DIGITOOL OPENMCL) (values chi-square significance contigency-table
-		   v1-values v2-values))
   (check-type v1 sequence)
   (check-type v2 sequence)
   (multiple-value-bind (table v1-values v2-values)
@@ -1298,8 +1273,8 @@ e_ij = [f_i* * f_*j] / f_**
 where f_i*, f_*j and f_** are the row, column and grand totals
 respectively.  In this case, the G-test is a test of independence.  The degrees of freedom is the same as for the chi-square statistic and the significance is obtained by comparing "
   (flet ((doit (contingency-table &optional expected-value-matrix)
-           (declare #-(or DIGITOOL OPENMCL) (values g-score g-significance dof))
-           (destructuring-bind (rows columns) (array-dimensions contingency-table)
+           (destructuring-bind (rows columns)
+	       (array-dimensions contingency-table)
              (let ((row-totals (make-list rows :initial-element 0))
 	           (column-totals (make-list columns :initial-element 0))
 	           (g-sum 0)
