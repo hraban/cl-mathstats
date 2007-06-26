@@ -141,8 +141,7 @@ products of the independent and dependent variables.
 You should first look at your data with a scatter plot to see if a linear model
 is plausible.  See the manual for a fuller explanation of linear regression
 statistics."
-  (declare #-(or DIGITOOL OPENMCL) (values slope intercept)
-	   (ignore y2))
+  (declare (ignore y2))
   (let ((NSSX  (- (* n x2) (* x x)))
 	(NSSXY (- (* n xy) (* x y))))
     (when (zerop NSSX)
@@ -161,7 +160,6 @@ as always, comes first in the argument list.
 You should first look at your data with a scatter plot to see if a linear model
 is plausible.  See the manual for a fuller explanation of linear regression
 statistics."
-  (declare #-(or DIGITOOL OPENMCL) (values slope intercept))
   (check-type dv sequence)
   (check-type iv sequence)
   (let ((ny (length dv))
@@ -191,8 +189,6 @@ of the products of the independent and dependent variables.
 You should first look at your data with a scatter plot to see if a linear model
 is plausible.  See the manual for a fuller explanation of linear regression
 statistics."
-  (declare #-(or DIGITOOL OPENMCL) 
-	   (values slope intercept determination std-err-slope p-value))
   (let ((NSSX  (- (* n x2) (* x x)))
 	(NSSY  (- (* n y2) (* y y)))
 	(NSSXY (- (* n xy) (* x y))))
@@ -224,8 +220,6 @@ variable, as always, comes first in the argument list.
 You should first look at your data with a scatter plot to see if a linear model
 is plausible.  See the manual for a fuller explanation of linear regression
 statistics."
-  (declare #-(or DIGITOOL OPENMCL)
-	   (values slope intercept determination std-err-slope p-value))
   (check-type dv sequence)
   (check-type iv sequence)
   (let ((ny (length dv))
@@ -260,9 +254,6 @@ of the products of the independent and dependent variables.
 You should first look at your data with a scatter plot to see if a linear model
 is plausible.  See the manual for a fuller explanation of linear regression
 statistics."
-  (declare #-(or DIGITOOL OPENMCL)
-	   (values slope intercept determination correlation
-		   std-err-slope std-err-intercept anova-table))
   (let ((NSSX  (- (* n x2) (* x x)))
 	(NSSY  (- (* n y2) (* y y)))
 	(NSSXY (- (* n xy) (* x y))))
@@ -304,9 +295,6 @@ functions, which do less computation.
 You should first look at your data with a scatter plot to see if a linear model
 is plausible.  See the manual for a fuller explanation of linear regression
 statistics."
-  (declare #-(or DIGITOOL OPENMCL)
-	   (values slope intercept determination correlation
-		   std-err-slope std-err-intercept anova-table))
   (check-type dv sequence)
   (check-type iv sequence)
   (let ((ny (length dv))
@@ -332,12 +320,6 @@ statistics."
 independent variables, `ivs.' Y on multiple X's, calculating the intercept and
 regression coefficient.  Calculates the F statistic, intercept and the
 correlation coefficient for Y on X's."
-  (declare #-(or DIGITOOL OPENMCL)
-	   (values intercept coefficients r-list t-bs betas 
-		   r-square f ss-reg-list  ss-percent-list
-		   ss-reg ss-res mse-reg mse-res
-		   ;; the following is for compatibility with the SVD algorithm
-		   compatibility-value))
   (let* ((num-x (length ivs))
 	 (rows (+ 2 num-x))
 	 (cols (length dv))
