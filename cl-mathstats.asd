@@ -43,7 +43,8 @@
 		 (:file "smoothing"
 			:depends-on ("utilities"))
 		 (:file "correlation-regression"
-			:depends-on ("package"))
+			:depends-on ("package"
+				     "define-statistical-fun"))
 		 (:file "anova"
 			:depends-on ("package"))))
                (:module 
