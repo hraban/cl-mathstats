@@ -4,49 +4,49 @@
 
 (html-file-page ("index")
   (html
-   (:HEAD (:TITLE "CL-MathStats")
+   (:head (:title "CL-MathStats")
           (generate-shared-headers))
-   (:BODY
+   (:body
     (generate-two-line-header
      "CL-MathStats" "Words cannot express")
     
-    ((:DIV :CLASS "contents")
+    ((:div :class "contents")
      (generate-system-sidebar)
      
-     ((:DIV :CLASS "system-description")
-       (:H3 "What it is")
-       (:P "CL-MathStats is an unordered collection of mathematical routines. ")
-       (:P (rw:link :tinaa) " documentation for CL-MathStats is "
-           (rw:link :CL-MathStats-tinaa :title "available") ".")
+     ((:div :class "system-description")
+       (:h3 "What it is")
+       (:p "CL-MathStats is an unordered collection of mathematical routines. ")
+       (:p (rw:link :tinaa) " documentation for CL-MathStats is "
+           (rw:link :cl-mathstats-tinaa :title "available") ".")
        
-       ((:A :NAME "mailing-lists"))
+       ((:a :name "mailing-lists"))
         (:h3 "Mailing Lists")
         (:ul 
-         (:li ((:a :href "http://common-lisp.net/cgi-bin/mailman/listinfo/cl-mathstats-announce") "cl-mathstats-announce")
-              ": A low volume, read only list for announcements.")
-         
          (:li ((:a :href "http://common-lisp.net/cgi-bin/mailman/listinfo/cl-mathstats-devel") "cl-mathstats-devel")
-              ": A list for questions, patches, bug reports, and so on; It's for everything 
-other than announcements."))
+              ": A list for questions, patches, bug reports, and so on"))
        
-       ((:A :NAME "downloads"))
-        (:H3 "Where is it")
-        (:P "A " (rw:link :darcs) " repository is available (note that you'll also need " (rw:link :metatilities) " and " (rw:link :moptilities) " to get CL-MathStats to work). The commands are listed below:")
-        (:PRE 
+       ((:a :name "downloads"))
+        (:h3 "Where is it")
+        (:p "A " (rw:link :darcs) " repository is available (note that you'll also need " (rw:link :metatilities) " and " (rw:link :moptilities) " to get CL-MathStats to work). The commands are listed below:")
+        (:pre 
          "darcs get http://common-lisp.net/project/cl-mathstats/darcs/cl-mathstats
 darcs get http://common-lisp.net/project/cl-containers/metatilities/darcs/metatilities
 darcs get http://common-lisp.net/project/cl-containers/moptilities/darcs/moptilities")
-        (:P "CL-MathStats (and friends) should also be " (rw:link :asdf-install :title "ASDF installable") ". Its CLiki home is right " (rw:link :cl-mathstats-cliki :title "where") " you'd expect.")
-        (:P "There's also a handy " (rw:link :cl-mathstats-package :title "gzipped tar file") ".")
+        (:p "CL-MathStats (and friends) should also be " (rw:link :asdf-install :title "ASDF installable") ". Its CLiki home is right " (rw:link :cl-mathstats-cliki :title "where") " you'd expect.")
+        (:p "There's also a handy " (rw:link :cl-mathstats-package :title "gzipped tar file") ".")
        
-       ((:A :NAME "news")
-        (:H3 "What is happening")
-        ((:TABLE :CLASS "system-news") 
-         (:TR
-          (:TH "11 Nov 2005")
-          (:TD "Just getting things set up here."))))))
+       ((:a :name "news")
+        (:h3 "What is happening")
+        ((:table :class "system-news") 
+         (:tr (:th "30 May 2007") 
+	      (:td "I hate keeping this up to date. I need to automate it!
+
+In any case, David Trudgett found a problem with CL-Mathstats define-statistic macro (it wasn't exporting its symbol _except_ at compile time. Go figure."))
+	 (:tr
+          (:th "11 Nov 2005")
+          (:td "Just getting things set up here."))))))
     
-    ((:DIV :CLASS "footer")
+    ((:div :class "footer")
      (generate-button-row 
       (format nil "Last updated: ~A" 
               (format-date "%A, %e %B %Y" (get-universal-time))))))))
