@@ -394,7 +394,7 @@ returns the two-tailed significance of z in a standard Gaussian distribution.
 This function implements the function that Numerical Recipes in C calls erfcc,
 see section 6.3; that is, it's the one using the Chebyshev approximation, since
 that is the one they call from their statistical functions.  It is quick to
-compute and has fractional error everywhere less than 1.2x10^{-7}."
+compute and has fractional error everywhere less than 1.2x10^\\{-7\\}."
   (check-type x float)
   (let* ((z   (abs x))
 	 (y   (/ 1.0 (+ 1.0 (* 0.5 z))))   ; instead of t
