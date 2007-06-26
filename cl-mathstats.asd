@@ -3,7 +3,7 @@
 (in-package #:asdf-cl-mathstats)
 
 (defsystem cl-mathstats
-  :version "0.8.1"
+  :version "0.8.2"
   :author "Gary Warren King <gwking@metabang.com>"
   :maintainer "Gary Warren King <gwking@metabang.com>"
   :licence "MIT Style License"
