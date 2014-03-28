@@ -272,8 +272,8 @@ number."
       ;; and there is less than 2 items left or (2) n is odd and there is less
       ;; than one item left.
       (if (if (evenp n)
-	      (<= (- n (* 2 n percentage)) 2.0)
-	      (<= (- n (* 2 n percentage)) 1.0))
+	      (<= (- n (* 2 n percentage)) 2f0)
+	      (<= (- n (* 2 n percentage)) 1f0))
 	  ;; Not enough left, so take median
 	  (if (evenp n)
 	      (if (null key)
@@ -1313,7 +1313,7 @@ respectively.  In this case, the G-test is a test of independence.  The degrees 
 ;;; ---------------------------------------------------------------------------
 
 (defun find-critical-value
-       (p-function p-value &optional (x-tolerance .00001) (y-tolerance .00001))
+       (p-function p-value &optional (x-tolerance 1f-5) (y-tolerance 1f-5))
   "Returns the critical value of some statistic.  The function `p-function'
 should be a unary function mapping statistics---x values---to their
 significance---p values.  The function will find the value of x such that the
@@ -1327,9 +1327,9 @@ value at x=0.  The binary search ends when either the function value is within
   ;; It generates this erroneous code...
   ;; (AND (TYPEP #:G3682 'REAL) (> (THE REAL #:G3682) (0)) ...)
   #-(or allegro lucid) (check-type p-value (real (0) (1)))
-  (let* ((x-low 0.0)
-	 (fx-low 1.0)
-	 (x-high 1.0)
+  (let* ((x-low 0f0)
+	 (fx-low 1f0)
+	 (x-high 1f0)
 	 (fx-high (funcall p-function x-high)))
     ;; double up
     (do () (nil)
@@ -1340,11 +1340,11 @@ value at x=0.  The binary search ends when either the function value is within
 	(return))
       (setf x-low x-high
 	    fx-low fx-high
-	    x-high (* 2.0 x-high)
+	    x-high (* 2f0 x-high)
 	    fx-high (funcall p-function x-high)))
     ;; binary search
     (do () (nil)
-      (let* ((x-mid  (/ (+ x-low x-high) 2.0))
+      (let* ((x-mid  (/ (+ x-low x-high) 2f0))
 	     (fx-mid (funcall p-function x-mid))
 	     (y-diff (abs (- fx-mid p-value)))
 	     (x-diff (- x-high x-low)))
@@ -1363,13 +1363,13 @@ value at x=0.  The binary search ends when either the function value is within
 
 #+test
 (defun test-find-critical-value ()
-  (dolist (alpha '(.1 .05 .01))
+  (dolist (alpha '(1f-1 5f-2 1f-2))
     (format t "x to give alpha = ~4,2f is:  ~5,3f~%"
 	    alpha
 	    (find-critical-value #'(lambda (x) (gaussian-significance x :both))
 				 alpha)))
   (dolist (dof '(2 5 10))
-    (dolist (alpha '(.1 .05 .01))
+    (dolist (alpha '(1f-1 5f-2 1f-2))
       (format t "with ~2d dof, the t to give upper-tail alpha = ~4,2f is:  ~5,3f~%"
 	      dof
 	      alpha

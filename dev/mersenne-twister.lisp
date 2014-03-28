@@ -16,7 +16,7 @@ ran1 generate floats 1.3 times faster (somewhat less consing)
       (let ((x 0)
             (g (make-random-number-generator 42 'mt-random-number-generator)))
         (loop repeat 10000 do
-              (setf x (uniform-random g 0.0 1.0)))
+              (setf x (uniform-random g 0f0 1f0)))
         x))
 
 (timeit (:report t)
@@ -44,7 +44,7 @@ ran1 generate floats 1.3 times faster (somewhat less consing)
       (let ((x 0)
             (g (make-random-number-generator 42 'ran1-random-number-generator)))
         (loop repeat 10000 do
-              (setf x (uniform-random g 0.0 1.0)))
+              (setf x (uniform-random g 0f0 1f0)))
         x))
 
 

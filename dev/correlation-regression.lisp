@@ -201,7 +201,7 @@ statistics."
 	   (determination (/ NSSR NSSY))
 	   (dof           (- n 2))
 	   (std-err-slope (sqrt (/ NSSE (* dof NSSX))))
-	   (p-value       (if (zerop NSSE) 0.0 
+	   (p-value       (if (zerop NSSE) 0f0
 			      (students-t-significance
 			       ;; Need a float here.
 			       (coerce (/ slope std-err-slope) 'float)
@@ -495,7 +495,7 @@ correlation coefficient for Y on X's."
 	  ;;calculate and list the portion of the sum of squares of the regression due 
 	  ;; to each X.
 	       
-	  '(let ((sum-y 0.0) (sum-z 0.0) (sum-z2 0.0) (sum-zy 0.0) (sum-y2 0.0))
+	  '(let ((sum-y 0f0) (sum-z 0f0) (sum-z2 0f0) (sum-zy 0f0) (sum-y2 0f0))
 	    (apply #'mapc
 		   #'(lambda (y &rest xs)
 		       (let ((z (loop for x in xs for c in coefficients
@@ -628,7 +628,7 @@ sibling functions -minimal and -verbose if you want less or more information."
   (multiple-value-bind (a b) (apply #'multiple-linear-regression-arrays dv ivs)
     (let ((x (svd-solve-linear-system a b nil)))
       (destructuring-bind (rows cols) (array-dimensions a)
-	(let ((SSE 0.0))
+	(let ((SSE 0f0))
 	  (dotimes (i rows)
 	    (let* ((model (loop for j from 0 below cols
 				sum (* (aref a i j) (aref x j))))
@@ -666,17 +666,17 @@ the sibling functions -minimal and -brief if you need less information."
 	      Bs		; the solution vector
 	      betas		; the standardized coefficients
 	      Ts		; the t-statistics for the b's.
-	      (SST 0.0)		; total sum of squares
-	      (SSE 0.0)		; sum squared error of residuals
+	      (SST 0f0)		; total sum of squares
+	      (SSE 0f0)		; sum squared error of residuals
 	      MSE		; mean squared error of residuals
-	      (SSR 0.0)		; sum squares due to regression
+	      (SSR 0f0)		; sum squares due to regression
 	      MSR		; mean square regression
 	      R2		; R-squared, the fraction variance accounted for
 	      F			; F ratio
 	      cov		; covariance matrix (among the coefficients)
 	      cor		; correlation matrix (among the variables)
 	      ssr-portions)	; portion of SSR for each iv
-	  (setf zeroed (svd-zero w 1.0e-6 nil))
+	  (setf zeroed (svd-zero w 1f-6 nil))
 	  
 	  ;; The solution vector includes all coefficients and the intercept,
 	  ;; which is the zeroth element.
@@ -684,7 +684,7 @@ the sibling functions -minimal and -brief if you need less information."
 	  
 	  ;; calculate SSE directly by computing predicted dv, subtracting
 	  ;; true dv, squaring and summing.  Also compute SST
-	  (let ((sum-y 0.0) (sum-y2 0.0) (sum-z 0.0) (sum-z2 0.0))
+	  (let ((sum-y 0f0) (sum-y2 0f0) (sum-z 0f0) (sum-z2 0f0))
 	    (dotimes (i n)
 	      (let* ((data  (aref y i))
 		     (model (loop for j from 0 below k
@@ -789,7 +789,7 @@ variable is row and column zero."
     (push dv ivs)
     (let ((matrix (make-array (list n n) :element-type 'single-float)))
       (dotimes (i n)
-	(setf (aref matrix i i) 1.0))
+	(setf (aref matrix i i) 1f0))
       (loop for v1 in ivs for i from 0 do
 	    (loop for v2 in ivs for j from 0 below i do
 		  (let ((r (r-score v1 v2)))

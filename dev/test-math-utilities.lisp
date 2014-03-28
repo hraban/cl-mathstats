@@ -2,8 +2,8 @@
 
 (deftestsuite on-interval () ()
   (:tests 
-   ((ensure (on-interval 1.0 0 1)))
-   ((ensure (not (on-interval 1.0 0 1 :upper-inclusive? nil))))
+   ((ensure (on-interval 1.0f0 0 1)))
+   ((ensure (not (on-interval 1.0f0 0 1 :upper-inclusive? nil))))
    ((ensure (on-interval 0 0 1)))
    ((ensure (not (on-interval 0 0 1 :lower-inclusive? nil))))
    ((ensure (not (on-interval 2 0 1))))

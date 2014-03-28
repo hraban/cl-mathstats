@@ -125,7 +125,7 @@ representation.  See the manual for more information."
 			 (scheffe-tests group-means group-sizes mse dfe))
 		       sst-alt
 		       (when (and (numberp confidence-intervals)
-				  (< 0.0 confidence-intervals 1.0))
+				  (< 0f0 confidence-intervals 1f0))
 			 (let ((current-group '#:new)
 			       (group-sums-squared nil))
 			   (map nil #'(lambda (key value)
@@ -225,7 +225,7 @@ representation.  See the manual for more information."
 				     mse dfe))
 		    sst-alt
 		    (when (and (numberp confidence-intervals)
-			       (< 0.0 confidence-intervals 1.0))
+			       (< 0f0 confidence-intervals 1f0))
 		      (map 'list #'(lambda (group)
 				     (multiple-value-list
 				       (confidence-interval-t group confidence-intervals)))

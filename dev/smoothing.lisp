@@ -37,7 +37,7 @@ sequence of numbers."
   (let ((prev (car data)))
     (map 'list
 	 #'(lambda (x)
-	     (prog1 (/ (+ x prev) 2.0)
+	     (prog1 (/ (+ x prev) 2f0)
 		    (setf prev x)))
 	 data)))
 
@@ -95,7 +95,7 @@ length as `data,' which should be a sequence of numbers."
 	   (when (< b d) (rotatef b d))
 	   (when (< c d) (rotatef c d))
 	   ;; median is mean of `b' and `c'
-	   (/ (+ b c) 2.0)))
+	   (/ (+ b c) 2f0)))
     (let ((n (data-length data)))
       (with-temp-vector (temp (+ n 3))
 	(setf (aref temp 0) (elt data 0))
@@ -158,7 +158,7 @@ ends are handled by duplicating the end elements.  This function is not
 destructive; it returns a list the same length as `data,' which should be a
 sequence of numbers."
   (flet ((weighted-mean (a b c)
-	   (/ (+ a (* 2 b) c) 4.0)))
+	   (/ (+ a (* 2 b) c) 4f0)))
     (let ((n (data-length data)))
       (with-temp-vector (temp (+ n 2))
 	(let ((first (elt data 0)))
@@ -203,7 +203,7 @@ neighbors.  The ends are handled by duplicating the end elements.  This function
 is not destructive; it returns a list the same length as `data,' which should be
 a sequence of numbers."
   (flet ((mean-3 (a b c)
-           (/ (+ a b c) 3.0)))
+           (/ (+ a b c) 3f0)))
     (let ((n (data-length data)))
       (with-temp-vector (temp (+ n 2))
         (setf (aref temp 0) (elt data 0))
@@ -221,7 +221,7 @@ neighbor, and its two right neighbors.  The ends are handled by duplicating the
 end elements.  This function is not destructive; it returns a list the same
 length as `data,' which should be a sequence of numbers."
   (flet ((mean-4 (a b c d)
-	   (/ (+ a b c d) 4.0)))
+	   (/ (+ a b c d) 4f0)))
     (let ((n (data-length data)))
       (with-temp-vector (temp (+ n 3))
 	(setf (aref temp 0) (elt data 0))
@@ -242,7 +242,7 @@ neighbors and its two right neighbors.  The ends are handled by duplicating the
 end elements.  This function is not destructive; it returns a list the same
 length as `data,' which should be a sequence of numbers."
   (flet ((mean-5 (a b c d e)
-           (/ (+ a b c d e) 5.0)))
+           (/ (+ a b c d e) 5f0)))
     (let ((n (data-length data)))
       (with-temp-vector (temp (+ n 4))
 	(let ((first (elt data 0)))
