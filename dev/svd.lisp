@@ -401,7 +401,7 @@ tests the inverse-finding function.  The input is a random square matrix, with
 		(setf (aref a i j) x)
 		(setf (aref u i j) x))))
 	  (svdcmp-df u rank rank w v)
-	  (svzero-df w rank 0.0d0001 2)
+	  (svzero-df w rank 1d-5 2)
 	  (svd-inverse-fast-df u w v a-1 tmp)
 	  (multiply-matrices a-1 a prod)
 	  (dotimes (i rank)

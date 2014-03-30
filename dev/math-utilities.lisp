@@ -61,14 +61,14 @@ run-time double-float contagion.")
 
 ;;; ---------------------------------------------------------------------------
 
-(defconstant +e+ 2.71828182845905423
+(defconstant +e+ 2.71828182845905423d0
   "An approximation of the constant e \(named for Euler!\).")
 
 ;;; ---------------------------------------------------------------------------
 
 (defun degrees->radians (degrees)
   "Convert degrees to radians."
-  (* degrees (/ fpi 180.)))
+  (* degrees (/ fpi 180f0)))
 
 ;;; ---------------------------------------------------------------------------
 
@@ -153,14 +153,16 @@ http://www2.springeronline.com/sgw/cda/frontpage/0,,4-10128-22-13887455-0,00.htm
 
 
 #+test
-(loop for (p r b) in '((.5 .5 .5) (.1 .5 .5) (.1 .5 0) (.1 .5 1) (.5 .1 0) (.5 .1 1))
+(loop for (p r b) in '((.5f0 .5f0 .5f0) (.1f0 .5f0 .5f0) (.1f0 .5f0 0f0)
+                       (.1f0 .5f0 1f0) (.5f0 .1f0 0f0) (.5f0 .1f0 1f0))
       do (format t "~2&f-measure:  ~D ~D ~D = ~5,D" p r b (f-measure p r b))
       do (format t "~&IET-f-val:  ~D ~D ~D = ~5,D" p r b (foo p r b))
       do (format t "~&Other-f-v:  ~D ~D ~D = ~5,D" p r b (bar p r b))
       do (format t "~&foobar--v:  ~D ~D ~D = ~5,D" p r b (bar p r b)))
 
 #+test
-(loop for (p r b) in '((.1 .5 0) (.1 .5 .5) (.1 .5 1.0) (.1 .5 2.0) (.1 .5 3.0))
+(loop for (p r b) in '((.1f0 .5f0 0f0) (.1f0 .5f0 .5f0) (.1f0 .5f0 1.0f0)
+                       (.1f0 .5f0 2.0f0) (.1f0 .5f0 3.0f0))
       ;;;do (format t "~2&f-measure:  ~D ~D ~D = ~5,D" p r b (f-measure p r b))
       do (format t "~2&IET-f-val:  ~D ~D ~D = ~5,D" p r b (foo p r b))
       do (format t "~&Other-f-v:  ~D ~D ~D = ~5,D" p r b (bar p r b)))

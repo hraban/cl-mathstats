@@ -123,7 +123,7 @@ Numerical Recipes in C, section 6.1"
     (cond ((< n 0)
 	   (error "N cannot be negative:  ~d" n))
 	  ((<= n 1)
-	   0.0)
+	   0f0)
 	  ((< n (length cache))
 	   (aref cache n))
 	  (t
@@ -163,7 +163,7 @@ function, `binomial-coefficient.'"
 	   (if (= level 0)
 	       (= x y)
 	       ;; returns true if fractional error is less than `level'
-	       (<= (/ (* 2.0 (abs (- x y))) (+ x y)) level))))
+	       (<= (/ (* 2f0 (abs (- x y))) (+ x y)) level))))
     (flet ((test-range (min max level)
 	     (do ((n min (1+ n)))
 		 ((> n max))
@@ -192,11 +192,11 @@ approximations, and so is computationally efficient but not necessarily exact."
   ;; Rather than signal an error if p is extreme, we might as well try to return
   ;; something sensible.  In fact, the exact function returns the same values.
   (case p
-    (0.0 (if (zerop k) 1.0 0.0))
-    (1.0 (if (= k n) 1.0 0.0))
+    (0.0 (if (zerop k) 1f0 0f0))
+    (1.0 (if (= k n) 1f0 0f0))
     (t   (exp (+ (- (factorial-ln n) (factorial-ln k) (factorial-ln (- n k)))
 		 (* k (log p))
-		 (* (- n k) (log (- 1.0 p))))))))
+		 (* (- n k) (log (- 1f0 p))))))))
 
 (defun binomial-probability-exact (p n k)
   "This is an exact but computationally intensive form of the preferred
@@ -255,7 +255,7 @@ Instead, it just returns 0.0d0"
 	#+Lucid lcl::floating-point-underflow
 	(condition)
 	(declare (ignore condition))
-	(values 0.0d0))))
+	(values 0.0f0))))
 
 #| Grabbed this off the net.
 
@@ -278,22 +278,22 @@ Instead, it just returns 0.0d0"
 manual for more information."
   (check-type a float)
   (check-type x float)
-  (assert (> a 0.0) (a) "a must be positive:  ~g" a)
-  (assert (>= x 0.0) (x) "x must be non-negative:  ~g" x)
+  (assert (> a 0f0) (a) "a must be positive:  ~g" a)
+  (assert (>= x 0f0) (x) "x must be non-negative:  ~g" x)
   (let ((gln (gamma-ln a)))
-    (when (= x 0.0)
-      (return-from gamma-incomplete (values 0.0 gln)))
-      (if (< x (+ a 1.0))
+    (when (= x 0f0)
+      (return-from gamma-incomplete (values 0f0 gln)))
+      (if (< x (+ a 1f0))
 	  ;; Use series representation.  The following is the code of what
 	  ;; Numerical Recipes in C calls ``GSER'
 	  (let* ((itmax 100)
-		 (eps   3.0e-7)
+		 (eps   3f-7)
 		 (ap    a)
-		 (sum   (/ 1.0 a))
+		 (sum   (/ 1f0 a))
 		 (del sum))
 	    (declare (type float ap sum del))
 	    (dotimes (i itmax)
-	      (incf ap 1.0)
+	      (incf ap 1f0)
 	      (setf del (* del (/ x ap)))
 	      (incf sum del)
 	      (if (< (abs del) (* eps (abs sum)))
@@ -307,9 +307,9 @@ manual for more information."
 	  ;; computes the complement of the desired result, so we subtract from
 	  ;; 1.0 at the end.
 	  (let ((itmax 100)
-		(eps   3.0e-7)
-		(gold 0.0) (g 0.0) (fac 1.0) (b1 1.0) (b0 0.0)
-		(anf 0.0) (ana 0.0) (an 0.0) (a1 x) (a0 1.0))
+		(eps   3f-7)
+		(gold 0f0) (g 0f0) (fac 1f0) (b1 1f0) (b0 0f0)
+		(anf 0f0) (ana 0f0) (an 0f0) (a1 x) (a0 1f0))
 	    (declare (type float gold g fac b1 b0 anf ana an a1 a0))
 	    (dotimes (i itmax)
 	      (setf an  (float (1+ i))
@@ -320,13 +320,13 @@ manual for more information."
 		    a1  (+ (* x a0) (* anf a1))
 		    b1  (+ (* x b0) (* anf b1)))
 	      (unless (zerop a1)
-		(setf fac (/ 1.0 a1)
+		(setf fac (/ 1f0 a1)
 		      g   (* b1 fac))
 		(if (< (abs (/ (- g gold) g)) eps)
 		    (let ((result (underflow-goes-to-zero
 				   (* (safe-exp (- (* a (log x)) x gln)) g))))
 		      (return-from
-			gamma-incomplete (values (- 1.0 result) gln)))
+			gamma-incomplete (values (- 1f0 result) gln)))
 		    (setf gold g))))
 	    (error "Continued Fraction didn't converge:~%~
                   Either a=~s is too large, or ITMAX=~d is too small." a itmax)))))
@@ -349,10 +349,10 @@ function.  It also reports particular values, which can be compared to tables."
 		 (push (list x (gamma-incomplete a (float x))) pts))
 	       `((:polyline-without-vertices ,(format nil "a = ~s" a) 0) . ,pts))))
       (plotter:plot-stuff
-	(list (igf 0.5)
-	      (igf 1.0)
-	      (igf 3.0)
-	      (igf 10.0))
+	(list (igf 5f-1)
+	      (igf 1f0)
+	      (igf 3f0)
+	      (igf 1f1))
 	:title "The incomplete gamma function P(a,x) for a=.5, 1.0, 3.0, and 10.0"))))
 
 ;;; ============================================================================
@@ -363,26 +363,26 @@ the Gaussian probability distribution.  See the manual for more information.
 Also see the function `gaussian-cdf.'
 
 This implementation follows Numerical Recipes in C, section 6.2"
-  (let ((erf (gamma-incomplete .5 (square x))))	; for x>0
+  (let ((erf (gamma-incomplete .5f0 (square x))))	; for x>0
     ;; because erf(-x)=-erf(x)
-    (if (>= x 0.0) erf (- erf))))
+    (if (>= x 0f0) erf (- erf))))
 
-(defun gaussian-cdf (x &optional (mean 0.0) (sd 1.0))
+(defun gaussian-cdf (x &optional (mean 0f0) (sd 1f0))
   "Computes the cumulative distribution function for a Gaussian random variable
 \(defaults: mean=0.0, s.d.=1.0\) evaluated at `x.' The result is the probability
 of getting a random number less than or equal to `x,' from the given Gaussian
 distribution."
-  (when (= sd 0.0)
+  (when (= sd 0f0)
     (if *gaussian-cdf-signals-zero-standard-deviation-error*
         (error 'zero-standard-deviation)
-      (if (> x mean) (return-from gaussian-cdf  1.0) (return-from gaussian-cdf 0.0))))
+      (if (> x mean) (return-from gaussian-cdf  1f0) (return-from gaussian-cdf 0f0))))
   (let ((z (/ (- x mean) sd)))
-    (* .5 (+ 1.0 (error-function (/ z (sqrt 2.0)))))))
+    (* .5 (+ 1f0 (error-function (/ z (sqrt 2f0)))))))
 
 #+test
 (defun test-error-function ()
   ;; just compare to tabulated values in any statistics book
-  (dolist (x '(-3.0 -2.0 -1.0 0.0 1.0 2.0 3.0))
+  (dolist (x '(-3f0 -2f0 -1f0 0f0 1f0 2f0 3f0))
     (format t "Gaussian CDF of ~4f is ~f~%" x (gaussian-cdf x))))
 
 (defun error-function-complement (x)
@@ -397,33 +397,33 @@ that is the one they call from their statistical functions.  It is quick to
 compute and has fractional error everywhere less than 1.2x10^\\{-7\\}."
   (check-type x float)
   (let* ((z   (abs x))
-	 (y   (/ 1.0 (+ 1.0 (* 0.5 z))))   ; instead of t
+	 (y   (/ 1f0 (+ 1f0 (* 5d-1 z))))   ; instead of t
 	 (ans
           (error-function-complement-short-1 y z)
           #+COMPILER-BUG
           (* y (exp (+ (* (- z) z)
-                       -1.26551223
+                       -1.26551223f0
                        (* y
-                          (+ 1.00002368
+                          (+ 1.00002368f0
                              (* y
-                                (+ 0.37409196
+                                (+ 0.37409196f0
                                    (* y
-                                      (+ 0.09678418
+                                      (+ 0.09678418f0
                                          (* y
-                                            (+ -0.18628806
+                                            (+ -0.18628806f0
                                                (* y
-                                                  (+ 0.27886807
+                                                  (+ 0.27886807f0
                                                      (* y
-                                                        (+ -1.13520398
+                                                        (+ -1.13520398f0
                                                            (* y
-                                                              (+ 1.48851587
+                                                              (+ 1.48851587f0
                                                                  (* y
-                                                                    (+ -0.82215223
-                                                                       (* y 0.17087277))))))))))))))))))))))
+                                                                    (+ -0.82215223f0
+                                                                       (* y 0.17087277f0))))))))))))))))))))))
     (declare (type float z y ans))
-    (if (>= x 0.0)
+    (if (>= x 0f0)
       ans
-      (- 2.0 ans))))
+      (- 2f0 ans))))
 
 #+CRAP ;Compiler bug here.  (Westy)
 (defun error-function-complement-helper (y z)
@@ -449,48 +449,48 @@ compute and has fractional error everywhere less than 1.2x10^\\{-7\\}."
 
 (defun error-function-complement-short-1 (y z)
   (* y (exp (+ (* (- z) z)
-               -1.26551223
-               (* y 
-		  (+ 1.00002368
-		     (* y 
-			(+ 0.37409196
-			   (* y 
-			      (+ 0.09678418
-				 (* y 
-				    (+ -0.18628806
+               -1.26551223f0
+               (* y
+		  (+ 1.00002368f0
+		     (* y
+			(+ 0.37409196f0
+			   (* y
+			      (+ 0.09678418f0
+				 (* y
+				    (+ -0.18628806f0
                                        (error-function-complement-short-2 y)))))))))))))
 
 (defun error-function-complement-short-2 (y)
-  (* y 
-     (+ 0.27886807
-        (* y 
-           (+ -1.13520398
-              (* y 
-                 (+ 1.48851587
-                    (* y 
-                       (+ -0.82215223
-                          (* y 0.17087277))))))))))
+  (* y
+     (+ 0.27886807f0
+        (* y
+           (+ -1.13520398f0
+              (* y
+                 (+ 1.48851587f0
+                    (* y
+                       (+ -0.82215223f0
+                          (* y 0.17087277f0))))))))))
 
 
   
 #+test
 (defun test-error-function-complement ()
   (dotimes (i 100)
-    (let* ((abs-x (/ i 20.0))		   ; range is 0 to 5.0
+    (let* ((abs-x (/ i 2f1))		   ; range is 0 to 5.0
 	   (x     (if (zerop (random 2)) abs-x (- abs-x)))
 	   (e1    (error-function-complement x))
-	   (e2    (- 1.0 (error-function x)))
+	   (e2    (- 1f0 (error-function x)))
 	   (del   (- e1 e2)))
-      (when (> (abs del) 1e-6)		   ; 10^-6 agreement between the two error functions
+      (when (> (abs del) 1f-6)		   ; 10^-6 agreement between the two error functions
 	(format t "~&on ~7f, difference is ~f" x del)
 	(spy e1 e2))))
   #+Explorer
   ;; The following shows erfcc to be about 4 times faster and does a lot less number-consing
   (time:timeit (:cpu :cons :number-cons :label "erf")
-    (error-function 1.75))
+    (error-function 1.75f0))
   #+Explorer
   (time:timeit (:cpu :cons :number-cons :label "erfcc")
-    (error-function-complement 1.75)))
+    (error-function-complement 1.75f0)))
 
 (defun gaussian-significance (x tails &optional mean sd)
   "Computes the significance of `x' in a Gaussian distribution with mean=`mean'
@@ -504,18 +504,18 @@ alternative hypothesis (H1) via the `tails' parameter, which must be :both,
 :positive, H1 is that `x' is positive, and similarly for :negative."
   (when mean (setf x (- x mean)))
   (when sd   (setf x (/ x sd)))
-  (let ((a (error-function-complement (* (abs x) (/ (sqrt 2.0d0))))))
+  (let ((a (error-function-complement (* (abs x) (/ (sqrt 2.0f0))))))
     ;; A is 2*Integral from x to Infinity of the z distribution
     (ecase tails
       (:both a)
       ;; The TI compiler actually does the right thing with the following code:
       ;; the repeated expressions only appear once in the object code!
       (:positive (if (plusp x)
-		     (* .5 a)
-		     (- 1.0 (* .5 a))))
+		     (* .5f0 a)
+		     (- 1.0f0 (* .5f0 a))))
       (:negative (if (plusp x)
-		     (- 1.0 (* .5 a))
-		     (* .5 a))))))
+		     (- 1.0f0 (* .5f0 a))
+		     (* .5f0 a))))))
 
 ;;; ============================================================================
 
@@ -527,7 +527,7 @@ expected number is `x.' The argument `k' should be an integer, while `x' should
 be a float.  The implementation follows Numerical Recipes in C, section 6.2"
   (check-type k integer)
   (check-type x float)
-  (- 1.0 (gamma-incomplete (float k x) x)))
+  (- 1f0 (gamma-incomplete (float k x) x)))
 
 (defun chi-square-significance (x dof)
   "Computes the complement of the cumulative distribution function for a
@@ -538,7 +538,7 @@ section 6.2.  Small values suggest that the null hypothesis should be rejected;
 in other words, this computes the significance of `x.'"
   (check-type dof integer)
   (check-type x float)
-  (- 1.0 (gamma-incomplete (* 0.5 dof) (* 0.5 x))))
+  (- 1f0 (gamma-incomplete (* 5f-1 dof) (* 5f-1 x))))
 
 ;;; ============================================================================
 
@@ -548,23 +548,23 @@ Student's t and the F distribution.
 
 All arguments must be floating-point numbers; `a' and `b' must be positive and
 `x' must be between 0.0 and 1.0, inclusive."
-   (check-type a (float (0.0) *))
-   (check-type b (float (0.0) *))
-   (check-type x (float 0.0 1.0))
+   (check-type a (float (0f0) *))
+   (check-type b (float (0f0) *))
+   (check-type x (float 0f0 1f0))
    (flet ((betacf (a b x)
 	    ;; straight from Numerical Recipes in C, section 6.3
 	    (declare (type float a b x))
 	    (let ((itmax 100)
-		  (eps   3.0e-7)
-		  (qap 0.0) (qam 0.0) (qab 0.0) (em  0.0) (tem 0.0) (d 0.0)
-		  (bz  0.0) (bm  1.0) (bp  0.0) (bpp 0.0)
-		  (az  1.0) (am  1.0) (ap  0.0) (app 0.0) (aold 0.0))
+		  (eps   3f-7)
+		  (qap 0f0) (qam 0f0) (qab 0f0) (em  0f0) (tem 0f0) (d 0f0)
+		  (bz  0f0) (bm  1f0) (bp  0f0) (bpp 0f0)
+		  (az  1f0) (am  1f0) (ap  0f0) (app 0f0) (aold 0f0))
 	      (declare (type float qap qam qab em tem d
 			     bz bm bp bpp az am ap app aold))
 	      (setf qab (+ a b)
-		    qap (+ a 1.0)
-		    qam (- a 1.0)
-		    bz  (- 1.0 (/ (* qab x) qap)))
+		    qap (+ a 1f0)
+		    qam (- a 1f0)
+		    bz  (- 1f0 (/ (* qab x) qap)))
 	      (dotimes (m itmax)
 		(setf em   (float (1+ m))
 		      tem  (+ em em)
@@ -580,27 +580,27 @@ All arguments must be floating-point numbers; `a' and `b' must be positive and
 		      am   (/ ap bpp)
 		      bm   (/ bp bpp)
 		      az   (/ app bpp)
-		      bz   1.0)
+		      bz   1f0)
 		(if (< (abs (- az aold)) (* eps (abs az)))
 		    (return-from betacf az)))
 	      (error "a=~s or b=~s too big, or itmax too small in betacf"
 		     a b))))
       (declare (notinline betacf))
-      (when (or (< x 0.0) (> x 1.0))
+      (when (or (< x 0f0) (> x 1f0))
 	 (error "x must be between 0.0 and 1.0:  ~f" x))
       ;; bt is the factors in front of the continued fraction
-      (let ((bt (if (or (= x 0.0) (= x 1.0))	    
-		    0.0
+      (let ((bt (if (or (= x 0f0) (= x 1f0))
+		    0f0
 		    (exp (+ (gamma-ln (+ a b))
 			    (- (gamma-ln a))
 			    (- (gamma-ln b))
 			    (* a (log x))
-			    (* b (log (- 1.0 x))))))))
-	 (if (< x (/ (+ a 1.0) (+ a b 2.0)))
+			    (* b (log (- 1f0 x))))))))
+	 (if (< x (/ (+ a 1f0) (+ a b 2f0)))
 	     ;; use continued fraction directly
 	     (/ (* bt (betacf a b x)) a) 
 	     ;; use continued fraction after making the symmetry transformation
-	     (- 1.0 (/ (* bt (betacf b a (- 1.0 x))) b))))))
+	     (- 1f0 (/ (* bt (betacf b a (- 1f0 x))) b))))))
 
 #+test
 (defun test-beta-incomplete ()
@@ -609,25 +609,25 @@ All arguments must be floating-point numbers; `a' and `b' must be positive and
   (flet ((ibf (a b)
 	   (let ((pts nil))
 	     (dotimes (x 101)
-	       (push (list (* .01 x) (beta-incomplete a b (* .01 x))) pts))
+	       (push (list (* 1f-2 x) (beta-incomplete a b (* 1f-2 x))) pts))
 	     `((:polyline-without-vertices ,(format nil "(~f,~f)" a b) 0) .
 	       ,pts))))
     (plotter:plot-stuff
-      (list (ibf 0.5 0.5)
-	    (ibf 0.5 5.0)
-	    (ibf 1.0 3.0)
-	    (ibf 8.0 10.0)
-	    (ibf 5.0 0.5)
+      (list (ibf 0.5f0 0.5f0)
+	    (ibf 0.5f0 5.0f0)
+	    (ibf 1.0f0 3.0f0)
+	    (ibf 8.0f0 10.0f0)
+	    (ibf 5.0f0 0.5f0)
 	    )
-      :y-first -0.05
-      :y-last   1.05
+      :y-first -0.05f0
+      :y-last   1.05f0
       :title
       (format nil "The incomplete beta function I_x(a,b)~%~
                    for five different pairs of (a,b):~2%~
                    ~@{(~f,~f) ~}~2%~
                    Notice that the pairs (0.5,5.0) and (5.0,0.5)~%~
                    are related by reflection symmetry around the diagonal."
-	      0.5 5.0 1.0 3.0 8.0 10.0 0.5 0.5 5.0 0.5))))
+	      0.5f0 5.0f0 1.0f0 3.0f0 8.0f0 10.0f0 0.5f0 0.5f0 5.0f0 0.5f0))))
 
 ;;; ============================================================================
 
@@ -653,18 +653,18 @@ This implementation follows Numerical Recipes in C, section 6.3."
   (check-type dof integer)
   (check-type tails (member :both :positive :negative))
   (setf dof (float dof t-statistic))
-  (let ((a (beta-incomplete (* 0.5 dof) 0.5 (/ dof (+ dof (square t-statistic))))))
+  (let ((a (beta-incomplete (* 0.5f0 dof) 0.5f0 (/ dof (+ dof (square t-statistic))))))
     ;; A is 2*Integral from (abs t-statistic) to Infinity of t-distribution
     (case tails
       (:both a)
       ;; The TI compiler actually does the right thing with the following code:
       ;; the repeated expressions only appear once in the object code!
       (:positive (if (plusp t-statistic)
-		     (* .5 a)
-		     (- 1.0 (* .5 a))))
+		     (* .5f0 a)
+		     (- 1.0f0 (* .5f0 a))))
       (:negative (if (plusp t-statistic)
-		     (- 1.0 (* .5 a))
-		     (* .5 a))))))
+		     (- 1.0f0 (* .5f0 a))
+		     (* .5f0 a))))))
 
 
 
@@ -700,12 +700,12 @@ treated as a boolean.
 This implementation follows Numerical Recipes in C, section 6.3 and the `ftest'
 function in section 13.4.  Some of the documentation is also drawn from the
 section 6.3, since I couldn't improve on their explanation."
-  (check-type f-statistic (float 0.0 *))
+  (check-type f-statistic (float 0.0f0 *))
   (check-type numerator-dof (integer 1 *))
   (check-type denominator-dof (integer 1 *))
   (let ((tail-area (beta-incomplete
 		     (* 0.5 denominator-dof)
-		     (* 0.5 numerator-dof)
+		     (* 0.5f0 numerator-dof)
 		     (float (/ denominator-dof
 			       (+ denominator-dof
 				  (* numerator-dof f-statistic)))))))
@@ -714,9 +714,9 @@ section 6.3, since I couldn't improve on their explanation."
 	;; Because of symmetry, we can double the area, but if H0 is strongly
 	;; viable, the tails can get confused, so we ensure that the area is
 	;; less than 1.0
-	(progn (setf tail-area (* 2.0 tail-area))
-	       (if (> tail-area 1.0)
-		   (- 2.0 tail-area)
+	(progn (setf tail-area (* 2.0f0 tail-area))
+	       (if (> tail-area 1.0f0)
+		   (- 2.0f0 tail-area)
 		   tail-area)))))
 
 ;;; ============================================================================
@@ -729,10 +729,11 @@ approximates the actual computation using the incomplete beta function, but is
 preferable for large `n' \(greater than a dozen or so\) because it avoids
 summing many tiny floating-point numbers.
 
-The implementation follows Numerical Recipes in C, section 6.3."
+The implementation follows Numerical Recipes in C, section 6.3
+."
   (assert (<= k n) () "Can't have more events than trials, so k <= n")
   (if (zerop k)
-      1.0
+      1.0f0
       (beta-incomplete (float k) (float (1+ (- n k))) (float p))))
 
 (defun binomial-cdf-exact (p n k)

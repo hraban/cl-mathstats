@@ -176,8 +176,8 @@ Trap errors and report the result."
 #+(and test Explorer)
 (defun plot-quantile ()
   "This is the example from the manual."
-  (loop for q from 0.0 to 1.0 by (/ 128.0)
-	collect (list (quantile '(2.0 3.0 5.0 8.0 13.0) q) q) into pts
+  (loop for q from 0.0f0 to 1.0f0 by (/ 128.0f0)
+	collect (list (quantile '(2.0f0 3.0f0 5.0f0 8.0f0 13.0f0) q) q) into pts
 	finally (plotter:plot-stuff
 		  `(((:polyline-without-vertices) . ,pts)))))
 
@@ -187,7 +187,7 @@ Trap errors and report the result."
 (test-function 'median)
 #+test
 (defun trimmed-mean-10 (data &rest standard-args)
-  (apply #'trimmed-mean data .1 standard-args))
+  (apply #'trimmed-mean data .1f0 standard-args))
 
 #+test
 (test-function 'trimmed-mean-10)
@@ -200,10 +200,10 @@ Trap errors and report the result."
   (dotimes (i 21)
     (spy (trimmed-mean '(1 2 3 4 5) (/ i 40))))
   (dotimes (i 21)
-    (spy (trimmed-mean '(1.0 2.0 4.0 8.0) (/ i 40))))
-  (spy (trimmed-mean '(1.0 2.0 4.0 8.0) .33 :start 2))
-  (spy (trimmed-mean '(1.0 2.0 4.0 8.0) .33 :end 3))
-  (spy (trimmed-mean '((1.0 a) (2.0 b) (4.0 c) (8.0 d)) .5 :key #'first)))
+    (spy (trimmed-mean '(1.0f0 2.0f0 4.0f0 8.0f0) (/ i 40))))
+  (spy (trimmed-mean '(1.0f0 2.0f0 4.0f0 8.0f0) .33f0 :start 2))
+  (spy (trimmed-mean '(1.0f0 2.0f0 4.0f0 8.0f0) .33f0 :end 3))
+  (spy (trimmed-mean '((1.0f0 a) (2.0f0 b) (4.0f0 c) (8.0f0 d)) .5f0 :key #'first)))
   
   
 
@@ -265,7 +265,7 @@ Trap errors and report the result."
 Statistics for Engineering and the Sciences, by Jay L.  DeVore, published by
 Brooks/Cole Publishing Company, copyright 1982.  The function above computes the
 correct t and does not reject H0."
-  (spy (t-test-one-sample '(27.2 29.3 31.5 28.7 30.2 29.6) :negative 30))
+  (spy (t-test-one-sample '(27.2f0 29.3f0 31.5f0 28.7f0 30.2f0 29.6f0) :negative 30))
   (spy (error-handling (t-test-one-sample 'a :both)))
   (spy (error-handling (t-test-one-sample '() :both)))
   (spy (error-handling (t-test-one-sample '(nil) :both)))
@@ -320,26 +320,26 @@ correct t and does not reject H0."
 	(multiple-value-setq (dd d-count) (d-test group1 group2 tails :h0mean h0mean :times 1000))
 	(format t "tails = ~s; h0mean = ~s~%t-test sig = ~5,3f~%d-test sig = ~5,3f (~d/1000)~2%"
 		tails h0mean
-		t-sig (/ d-count 1000.0) d-count)))
+		t-sig (/ d-count 1f3) d-count)))
     '(dolist (tails '(:positive))
       (dolist (h0mean '(1 2 3 4 5))
 	(multiple-value-setq (tt t-sig) (t-test group1 group2 tails h0mean))
 	(multiple-value-setq (dd d-count) (d-test group1 group2 tails :h0mean h0mean :times 1000))
 	(format t "tails = ~s; h0mean = ~s~%t-test sig = ~5,3f~%d-test sig = ~5,3f (~d/1000)~2%"
 		tails h0mean
-		t-sig (/ d-count 1000.0) d-count)))
+		t-sig (/ d-count 1f3) d-count)))
     (dolist (tails '(:both))
       (dolist (h0mean '(1 2 3 4 5 6 7))
 	(multiple-value-setq (tt t-sig) (t-test group1 group2 tails h0mean))
 	(multiple-value-setq (dd d-count) (d-test group1 group2 tails :h0mean h0mean :times 1000))
 	(format t "tails = ~s; h0mean = ~s~%t-test sig = ~5,3f~%d-test sig = ~5,3f (~d/1000)~2%"
 		tails h0mean
-		t-sig (/ d-count 1000.0) d-count)))))
+		t-sig (/ d-count 1f3) d-count)))))
 
 #+(and test Explorer)
 (defun time-d-test ()
-  (let ((s1 (loop repeat 20 collect (random 10.0)))
-	(s2 (loop repeat 20 collect (+ 2.0 (random 10.0)))))
+  (let ((s1 (loop repeat 20 collect (random 1f1)))
+	(s2 (loop repeat 20 collect (+ 2f0 (random 1f1)))))
     (time:timeit (:cpu :cons :number-cons)
       (t-test s1 s2 :both))
     (time:timeit (:cpu :cons :number-cons)
@@ -352,8 +352,10 @@ Statistics for Engineering and the Sciences, by Jay L.  DeVore, published by
 Brooks/Cole Publishing Company, copyright 1982.  The function above computes the
 correct t and does not reject H0."
   (spy (t-test-matched
-	 '(30.99 31.47 30.00 30.64 35.25 30.62 31.91 31.37 13.22 21.14 27.21 28.27 29.75 24.90 27.86 31.33)
-	 '(30.05 31.75 28.50 31.18 35.12 30.55 31.88 31.05 12.97 21.92 27.26 28.14 30.05 25.10 27.72 31.30)
+	 '(30.99f0 31.47f0 30.00f0 30.64f0 35.25f0 30.62f0 31.91f0 31.37f0
+           13.22f0 21.14f0 27.21f0 28.27f0 29.75f0 24.90f0 27.86f0 31.33f0)
+	 '(30.05f0 31.75f0 28.50f0 31.18f0 35.12f0 30.55f0 31.88f0 31.05f0
+           12.97f0 21.92f0 27.26f0 28.14f0 30.05f0 25.10f0 27.72f0 31.30f0)
 	 :both)))
 
 #+test
@@ -381,8 +383,8 @@ correct t and does not reject H0."
 and Statistics for Engineering and the Sciences, by Jay L.  DeVore, published by
 Brooks/Cole Publishing Company, copyright 1982.  The function above computes the
 correct correlation."
-  (spy (correlation '(1.98 1.44 2.02 1.20 1.57 1.82 1.45 1.80)
-		    '(5.6  7.7  8.8  5.1  6.8  3.9  4.5  5.8)))
+  (spy (correlation '(1.98f0 1.44f0 2.02f0 1.20f0 1.57f0 1.82f0 1.45f0 1.80f0)
+		    '(5.6f0  7.7f0  8.8f0  5.1f0  6.8f0  3.9f0  4.5f0  5.8f0)))
   (spy (error-handling (correlation 'a '(2 3 4 5))))
   (spy (error-handling (correlation '() '(2 3 4 5))))
   (spy (error-handling (correlation '(nil) '(2 3 4 5))))
@@ -425,10 +427,10 @@ correct correlation."
 
 #+test
 (defun test-confidence-interval-z ()
-  (spy (confidence-interval-z '(1 2 3 4 5 6) .9))
-  (spy (confidence-interval-z '(1 2 3 4 5 6) .95))
-  (spy (confidence-interval-z '(1 2 3 4 5 6) .99))
-  (spy (confidence-interval-z '(1 2 3 4 5 6) .999))
+  (spy (confidence-interval-z '(1 2 3 4 5 6) .9f0))
+  (spy (confidence-interval-z '(1 2 3 4 5 6) .95f0))
+  (spy (confidence-interval-z '(1 2 3 4 5 6) .99f0))
+  (spy (confidence-interval-z '(1 2 3 4 5 6) .999f0))
   #+Explorer
   (progn
     (format t "~2&mean~%")
@@ -451,35 +453,36 @@ correct correlation."
 		 (standard-deviation '(1 2 3 4 5 6)))
     (format t "~2&confidence interval-z--cached~%")
     (time:timeit (:cpu :cons)
-		 (confidence-interval-z '(1 2 3 4 5 6) .9)
-		 (confidence-interval-z '(1 2 3 4 5 6) .95)
-		 (confidence-interval-z '(1 2 3 4 5 6) .99)
-		 '(confidence-interval-z '(1 2 3 4 5 6) .999))
+		 (confidence-interval-z '(1 2 3 4 5 6) .9f0)
+		 (confidence-interval-z '(1 2 3 4 5 6) .95f0)
+		 (confidence-interval-z '(1 2 3 4 5 6) .99f0)
+		 '(confidence-interval-z '(1 2 3 4 5 6) .999f0))
     (format t "~2&confidence interval-z--computed~%")
     (time:timeit (:cpu :cons)
-		 (confidence-interval-z '(1 2 3 4 5 6) .9)
-		 (confidence-interval-z '(1 2 3 4 5 6) .95)
-		 (confidence-interval-z '(1 2 3 4 5 6) .99)
-		 (confidence-interval-z '(1 2 3 4 5 6) .999))))
+		 (confidence-interval-z '(1 2 3 4 5 6) .9f0)
+		 (confidence-interval-z '(1 2 3 4 5 6) .95f0)
+		 (confidence-interval-z '(1 2 3 4 5 6) .99f0)
+		 (confidence-interval-z '(1 2 3 4 5 6) .999f0))))
 
 #+test
 (defun test-confidence-interval-t ()
   ;; From DeVore, page 335
   (spy (confidence-interval-t
-	 '(26.7 25.8 24.0 24.9 26.4 25.9 24.4 21.7 24.1 25.9 27.3 26.9 27.3 24.8 23.6)
-	 .95))
+	 '(26.7f0 25.8f0 24.0f0 24.9f0 26.4f0 25.9f0 24.4f0 21.7f0
+           24.1f0 25.9f0 27.3f0 26.9f0 27.3f0 24.8f0 23.6f0)
+	 .95f0))
   (dolist (n '(10 20 30 50 70 90 120 200))
-    (let ((data (loop for i from 1 to n collect (random 1.0)))
+    (let ((data (loop for i from 1 to n collect (random 1.0f0)))
 	  mean z-low z-high t-low t-high)
-      (multiple-value-setq (mean z-low z-high) (confidence-interval-z data .95))
-      (multiple-value-setq (mean t-low t-high) (confidence-interval-t data .95))
+      (multiple-value-setq (mean z-low z-high) (confidence-interval-z data .95f0))
+      (multiple-value-setq (mean t-low t-high) (confidence-interval-t data .95f0))
       (format t "~&dof: ~3d z-width: ~6f t-width: ~6f~%"
 	      n (- z-high z-low) (- t-high t-low)))))
 
 #+test
 (defun test-confidence-interval-proportion ()
   ;; From DeVore, page 331
-  (spy (confidence-interval-proportion 184 244 .90)))
+  (spy (confidence-interval-proportion 184 244 .90f0)))
 
 #+test
 (defun test-anova-one-way-variables ()
@@ -519,17 +522,17 @@ correct correlation."
 #+test
 (defun test-scheffe-tests ()
   ;; From Cohen
-  (let ((means '(4.241 3.754 2.847 2.345))
+  (let ((means '(4.241f0 3.754f0 2.847f0 2.345f0))
 	(sizes '(29 118 59 59)))
-    (spy (scheffe-tests means sizes 1.811 261))))
+    (spy (scheffe-tests means sizes 1.811f0 261))))
 
 #+test
 (defun test-print-scheffe-table ()
   ;; From Cohen
-  (let ((means '(4.241 3.754 2.847 2.345))
+  (let ((means '(4.241f0 3.754f0 2.847f0 2.345f0))
 	(sizes '(29 118 59 59)))
-    (print-scheffe-table (scheffe-tests means sizes 1.811 261))
-    (print-scheffe-table (scheffe-tests means sizes 1.811 261)
+    (print-scheffe-table (scheffe-tests means sizes 1.811f0 261))
+    (print-scheffe-table (scheffe-tests means sizes 1.811f0 261)
 			 means)))
 
 #+test
@@ -553,14 +556,14 @@ correct correlation."
 	       #(199 176 182 200 169 175)
 	       #(186 203 217 197 209 208)
 	       #(191 189 184 188 177 205))
-	    t 0.9))
+	    t 0.9f0))
     ;; with lists of floats
     (test (anova-one-way-groups
-	    '((18.7 21.1 17.9 19.5 22.1 18.3)
-	      (19.9 17.6 18.2 20.0 16.9 17.5)
-	      (18.6 20.3 21.7 19.7 20.9 20.8)
-	      (19.1 18.9 18.4 18.8 17.7 20.5))
-	    t 0.9))
+	    '((18.7f0 21.1f0 17.9f0 19.5f0 22.1f0 18.3f0)
+	      (19.9f0 17.6f0 18.2f0 20.0f0 16.9f0 17.5f0)
+	      (18.6f0 20.3f0 21.7f0 19.7f0 20.9f0 20.8f0)
+	      (19.1f0 18.9f0 18.4f0 18.8f0 17.7f0 20.5f0))
+	    t 0.9f0))
     ;; with arrays of integers
     (test (anova-one-way-variables
 	    '#(a a a a a a b b b b b b c c c c c c d d d d d d)
@@ -568,22 +571,22 @@ correct correlation."
 		   199 176 182 200 169 175
 		   186 203 217 197 209 208
 		   191 189 184 188 177 205)
-	    t 0.9))
+	    t 0.9f0))
     ;; with lists of floats
     (test (anova-one-way-variables	
 	    '(a a a a a a b b b b b b c c c c c c d d d d d d)
-	    '(18.7 21.1 17.9 19.5 22.1 18.3
-		   19.9 17.6 18.2 20.0 16.9 17.5
-		   18.6 20.3 21.7 19.7 20.9 20.8
-		   19.1 18.9 18.4 18.8 17.7 20.5)
-	    t 0.9))
+	    '(18.7f0 21.1f0 17.9f0 19.5f0 22.1f0 18.3f0
+              19.9f0 17.6f0 18.2f0 20.0f0 16.9f0 17.5f0
+              18.6f0 20.3f0 21.7f0 19.7f0 20.9f0 20.8f0
+              19.1f0 18.9f0 18.4f0 18.8f0 17.7f0 20.5f0)
+	    t 0.9f0))
     ))
 #+test
 (defun test-anova-two-way-groups ()
   ;; example 11.4 from Devore
-  (let* ((data  '#(10.5 9.2 7.9 12.8 11.2 13.3 12.1 12.6 14.0 10.8 9.1 12.5
-			8.1 8.6 10.1 12.7 13.7 11.5 14.4 15.4 13.7 11.3 12.5 14.5
-			16.1 15.3 17.5 16.6 19.2 18.5 20.8 18.0 21.0 18.4 18.9 17.2))
+  (let* ((data  '#(10.5f0 9.2f0 7.9f0 12.8f0 11.2f0 13.3f0 12.1f0 12.6f0 14.0f0 10.8f0 9.1f0 12.5f0
+                   8.1f0 8.6f0 10.1f0 12.7f0 13.7f0 11.5f0 14.4f0 15.4f0 13.7f0 11.3f0 12.5f0 14.5f0
+                   16.1f0 15.3f0 17.5f0 16.6f0 19.2f0 18.5f0 20.8f0 18.0f0 21.0f0 18.4f0 18.9f0 17.2f0))
 	 (data3 (make-array '(3 4 3) :displaced-to data)))
     (loop for i from 0 below 3 do
 	  (loop for j from 0 below 4 do
@@ -622,7 +625,10 @@ correct correlation."
 (defun test-anova-two-way-variables-unequal-cell-sizes-3 ()
   (let ((iv2 '(10   10  10  20   30   40   10  10  10   20   20   20   30   30   30   40   40   40   30   30   30   40   10   10   10   20   20   20   30   30   30   40))
         (iv1 '(H    H   H   H    H    H    IFE IFE IFE  IFE  IFE  IFE  IFE  IFE  IFE  IFE  IFE  IFE  IFE  IFE  IFE  IFE  P    P    P    P    P    P    P    P    P    P))
-        (dv  '(10.5 9.2 7.9 12.8 14.0 12.5 8.1 8.6 10.1 12.7 13.7 11.5 14.4 15.4 13.7 11.3 12.5 14.5 14.4 15.4 13.7 14.5 16.1 15.3 17.5 16.6 19.2 18.5 20.8 18.0 21.0 18.4)))
+        (dv  '(10.5f0 9.2f0 7.9f0 12.8f0 14.0f0 12.5f0 8.1f0 8.6f0
+               10.1f0 12.7f0 13.7f0 11.5f0 14.4f0 15.4f0 13.7f0 11.3f0
+               12.5f0 14.5f0 14.4f0 15.4f0 13.7f0 14.5f0 16.1f0 15.3f0
+               17.5f0 16.6f0 19.2f0 18.5f0 20.8f0 18.0f0 21.0f0 18.4f0)))
     (multiple-value-bind (table ab-matrix row-totals column-totals grand-total a-list b-list cell-counts)
         (anova-two-way-variables-unequal-cell-sizes dv iv1 iv2)
       (print-anova-table table)
@@ -858,9 +864,9 @@ correct correlation."
 	(iv2 '(10 10 10 20 20 20 30 30 30 40 40 40
 		  10 10 10 20 20 20 30 30 30 40 40 40
 		  10 10 10 20 20 20 30 30 30 40 40 40))
-	(dv  '(10.5 9.2 7.9 12.8 11.2 13.3 12.1 12.6 14.0 10.8 9.1 12.5 
-		    8.1 8.6 10.1 12.7 13.7 11.5 14.4 15.4 13.7 11.3 12.5 14.5 
-		    16.1 15.3 17.5 16.6 19.2 18.5 20.8 18.0 21.0 18.4 18.9 17.2)))
+	(dv  '(10.5f0 9.2f0 7.9f0 12.8f0 11.2f0 13.3f0 12.1f0 12.6f0 14.0f0 10.8f0 9.1f0 12.5f0
+               8.1f0 8.6f0 10.1f0 12.7f0 13.7f0 11.5f0 14.4f0 15.4f0 13.7f0 11.3f0 12.5f0 14.5f0
+               16.1f0 15.3f0 17.5f0 16.6f0 19.2f0 18.5f0 20.8f0 18.0f0 21.0f0 18.4f0 18.9f0 17.2f0)))
     (let ((data3 (make-3d-table dv iv1 iv2)))
       (loop for i from 0 below 3 do
 	    (loop for j from 0 below 4 do
@@ -874,19 +880,20 @@ correct correlation."
 #+test
 (defun test-linear-regression-minimal ()
   ;; example 12.1 from Devore
-  (let ((iv '(2.5 5 10 15 17.5 20 25 30 35 40))
+  (let ((iv '(2.5f0 5 10 15 17.5f0 20 25 30 35 40))
 	(dv '(63 58 55 61 62 37 38 45 46 19)))
     (spy (linear-regression-minimal dv iv))
     #+Explorer
     (time:timeit (:cpu :cons :number-cons) (linear-regression-brief dv iv)))
   ;; example 12.2 from Devore
   (let ((iv '(300 350 400 400 450 450 480 480 530 530 580 580 620 620 670 700))
-	(dv '(5.8 4.5 5.9 6.2 6.0 7.5 6.1 8.6 8.9 8.2 14.2 11.9 11.1 11.5 14.5 14.8)))
+	(dv '(5.8f0 4.5f0 5.9f0 6.2f0 6.0f0 7.5f0 6.1f0 8.6f0
+              8.9f0 8.2f0 14.2f0 11.9f0 11.1f0 11.5f0 14.5f0 14.8f0)))
     (spy (linear-regression-minimal dv iv))
     #+Explorer
     (time:timeit (:cpu :cons :number-cons) (linear-regression-brief dv iv)))
   ;; example 12.3 from Devore
-  (let ((iv '(8.3 8.3 12.1 12.1 17.0 17.0 17.0 24.3 24.3 24.3 33.6))
+  (let ((iv '(8.3f0 8.3f0 12.1f0 12.1f0 17.0f0 17.0f0 17.0f0 24.3f0 24.3f0 24.3f0 33.6f0))
 	(dv '(227 312 362 521 640 539 728 945 738 759 1263)))
     (spy (linear-regression-minimal dv iv))
     #+Explorer
@@ -896,19 +903,20 @@ correct correlation."
 #+test
 (defun test-linear-regression-brief-summaries ()
   ;; example 12.1 from Devore
-  (let ((iv '(2.5 5 10 15 17.5 20 25 30 35 40))
+  (let ((iv '(2.5f0 5 10 15 17.5f0 20 25 30 35 40))
 	(dv '(63 58 55 61 62 37 38 45 46 19)))
     (spy (linear-regression-brief dv iv))
     #+Explorer
     (time:timeit (:cpu :cons :number-cons) (linear-regression-brief dv iv)))
   ;; example 12.2 from Devore
   (let ((iv '(300 350 400 400 450 450 480 480 530 530 580 580 620 620 670 700))
-	(dv '(5.8 4.5 5.9 6.2 6.0 7.5 6.1 8.6 8.9 8.2 14.2 11.9 11.1 11.5 14.5 14.8)))
+	(dv '(5.8f0 4.5f0 5.9f0 6.2f0 6.0f0 7.5f0 6.1f0 8.6f0
+              8.9f0 8.2f0 14.2f0 11.9f0 11.1f0 11.5f0 14.5f0 14.8f0)))
     (spy (linear-regression-brief dv iv))
     #+Explorer
     (time:timeit (:cpu :cons :number-cons) (linear-regression-brief dv iv)))
   ;; example 12.3 from Devore
-  (let ((iv '(8.3 8.3 12.1 12.1 17.0 17.0 17.0 24.3 24.3 24.3 33.6))
+  (let ((iv '(8.3f0 8.3f0 12.1f0 12.1f0 17.0f0 17.0f0 17.0f0 24.3f0 24.3f0 24.3f0 33.6f0))
 	(dv '(227 312 362 521 640 539 728 945 738 759 1263)))
     (spy (linear-regression-brief dv iv))
     #+Explorer
@@ -928,7 +936,7 @@ correct correlation."
       (linear-regression-brief-summaries 32 3893 290 478537 4160 36473))
     #+Explorer
     (time:timeit (:cpu :cons :number-cons)
-      (linear-regression-brief-summaries 32 3893.0 290.0 478537.0 4160.0 36473.0)))
+      (linear-regression-brief-summaries 32 3893.0f0 290.0f0 478537.0f0 4160.0f0 36473.0f0)))
   ;; example 12.5 from Devore.  The p-value doesn't match Devore's because his
   ;; example is testing whether slope=20, rather than whether slope=0.
   (let ((iv '(78 75 78 81 84 86 87))
@@ -942,13 +950,13 @@ correct correlation."
 	  (spy t-stat
 	       dof
 	       (students-t-significance t-stat dof :positive)
-	       (confidence-interval-t-summaries slope dof se-slope .95)))))
+	       (confidence-interval-t-summaries slope dof se-slope .95f0)))))
     #+Explorer
     (time:timeit (:cpu :cons :number-cons)
       (linear-regression-brief dv iv)))
   ;; example 12.10 from Devore
-  (let ((iv '(1.98 1.44 2.02 1.20 1.57 1.82 1.45 1.80))
-	(dv '(5.6 7.7 8.8 5.1 6.8 3.9 4.5 5.8)))
+  (let ((iv '(1.98f0 1.44f0 2.02f0 1.20f0 1.57f0 1.82f0 1.45f0 1.80f0))
+	(dv '(5.6f0 7.7f0 8.8f0 5.1f0 6.8f0 3.9f0 4.5f0 5.8f0)))
     (multiple-value-bind (ignore ignore r2) (linear-regression-brief dv iv)
       (spy (sqrt r2)))
     #+Explorer
@@ -989,7 +997,7 @@ correct correlation."
 #+test
 (defun test-multiple-linear-regression-normal ()
   (multiple-value-bind (dv ivs)
-      (generate-test-data-for-multiple-linear-regression 1 '(2 3 4) 50 10.0)
+      (generate-test-data-for-multiple-linear-regression 1 '(2 3 4) 50 10.0f0)
     (spy (apply #'multiple-linear-regression-normal dv ivs))))
 
 #+test
@@ -1003,8 +1011,14 @@ MSE = 1.18
 R2  = .965
 F   = 344.64
 "
-  (let ((y '(30.9 32.7 36.7 41.9 40.9 42.9 46.3 47.6 47.2 44.0 47.7 43.9 46.8 46.2 47.0 46.8 45.9 48.8 46.2 47.8 49.2 48.3 48.6 50.2 49.6 53.2 54.3 55.8))
-	(x1 '(8.5 8.9 10.6 10.2 9.8 10.8 11.6 12.0 12.5 10.9 12.2 11.9 11.3 13.0 12.9 12.0 12.9 13.1 11.4 13.2 11.6 12.1 11.3 11.1 11.5 11.6 11.7 11.7))
+  (let ((y '(30.9f0 32.7f0 36.7f0 41.9f0 40.9f0 42.9f0 46.3f0 47.6f0
+             47.2f0 44.0f0 47.7f0 43.9f0 46.8f0 46.2f0 47.0f0 46.8f0
+             45.9f0 48.8f0 46.2f0 47.8f0 49.2f0 48.3f0 48.6f0 50.2f0
+             49.6f0 53.2f0 54.3f0 55.8f0))
+	(x1 '(8.5f0 8.9f0 10.6f0 10.2f0 9.8f0 10.8f0 11.6f0 12.0f0
+              12.5f0 10.9f0 12.2f0 11.9f0 11.3f0 13.0f0 12.9f0
+              12.0f0 12.9f0 13.1f0 11.4f0 13.2f0 11.6f0 12.1f0
+              11.3f0 11.1f0 11.5f0 11.6f0 11.7f0 11.7f0))
 	(x2 '(2 3 3 20 22 20 31 32 31 28 36 28 30 27 24 25 28 28 32 28 35 34 35 40 45 50 55 57)))
     ;; Test that the data are typed in correctly.  They are
     '(progn 
@@ -1029,12 +1043,12 @@ F   = 344.64
 
 #+test
 (defun generate-test-data-for-multiple-linear-regression
-       (true-intercept true-coefs num-data &optional (sd 1.0))
+       (true-intercept true-coefs num-data &optional (sd 1.0f0))
   "Generates a list of dv values and a list of lists of iv values."
   (let ((dv nil)
 	(ivs (loop for x in true-coefs collect nil)))
     (dotimes (i num-data)
-      (let ((xs (loop for c in true-coefs collect (random 100.0))))
+      (let ((xs (loop for c in true-coefs collect (random 1f2))))
 	;; record the independent variables
 	(do ((iv-list ivs (cdr iv-list))
 	     (x-list  xs  (cdr x-list)))
@@ -1045,7 +1059,7 @@ F   = 344.64
 	(push (loop for x in xs
 		    for c in true-coefs
 		    sum (* x c) into s
-		    finally (return (+ true-intercept s (math:normal-random 0.0 sd))))
+		    finally (return (+ true-intercept s (math:normal-random 0f0 sd))))
 	      dv)))
     (values dv ivs)))
 
@@ -1069,7 +1083,7 @@ F   = 344.64
 #+test
 (defun test-multiple-linear-regression-brief ()
   (multiple-value-bind (dv ivs)
-      (generate-test-data-for-multiple-linear-regression 1 '(2 3 4) 1000 1.0)
+      (generate-test-data-for-multiple-linear-regression 1 '(2 3 4) 1000 1f0)
     (spy (apply #'multiple-linear-regression-brief dv ivs))
     (multiple-value-bind (int coefs r-list t-bs betas r-square f ss-regs ss-percent ss-reg ss-res mse-reg mse-res)
 	(apply #'multiple-linear-regression-normal dv ivs)
@@ -1091,7 +1105,7 @@ F   = 344.64
 #+test
 (defun test-MLR-verbose-vs-LR-vs-MLR ()
   (multiple-value-bind (dv ivs)
-      (generate-test-data-for-multiple-linear-regression 1 '(5) 10 10.0)
+      (generate-test-data-for-multiple-linear-regression 1 '(5) 10 1f1)
     (spy (linear-regression-verbose dv (car ivs)))
     (spy (apply #'multiple-linear-regression-normal dv ivs))
     (spy (apply #'multiple-linear-regression-verbose dv ivs))))
@@ -1099,7 +1113,7 @@ F   = 344.64
 #+test
 (defun test-multiple-linear-regression-verbose ()
   (multiple-value-bind (dv ivs)
-      (generate-test-data-for-multiple-linear-regression 1 '(2 3 4 10) 10 5.0)
+      (generate-test-data-for-multiple-linear-regression 1 '(2 3 4 10) 10 5f0)
     (time:timeit (:cpu :label "svd") (apply #'multiple-linear-regression-verbose dv ivs))
     (time:timeit (:cpu :label "norm") (apply #'multiple-linear-regression-normal dv ivs))
     (let ((v1 (multiple-value-list (apply #'multiple-linear-regression-verbose dv ivs)))
@@ -1113,9 +1127,9 @@ F   = 344.64
 #+test
 (defun test-multiple-linear-regression-verbose-on-degenerate-data ()
   (multiple-value-bind (dv ivs)
-      (generate-test-data-for-multiple-linear-regression 1 '(2 3 4 10) 100 5.0)
+      (generate-test-data-for-multiple-linear-regression 1 '(2 3 4 10) 100 5f0)
     ;; create a degenerate column
-    (push (mapcar #'(lambda (a b c) (+ (* 1.5 a) (* 2.5 b) (* 3.5 c)))
+    (push (mapcar #'(lambda (a b c) (+ (* 1.5f0 a) (* 2.5f0 b) (* 3.5f0 c)))
 		  (car ivs) (cadr ivs) (caddr ivs))
 	  ivs)
     (let ((v1 (multiple-value-list (apply #'multiple-linear-regression-verbose dv ivs)))
