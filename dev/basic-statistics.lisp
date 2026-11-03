@@ -140,7 +140,7 @@ number)."
   (declare (ignore start end))
   (if (null key)
       (apply #'reduce-elements data #'min standard-args)
-      (apply #'reduce data
+      (apply #'reduce-elements data
 	     #'(lambda (x y)
 			  (if (< (funcall key x)
 				 (funcall key y))
